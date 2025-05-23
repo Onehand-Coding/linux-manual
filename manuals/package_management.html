@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux Manual - Package Management</title>
+    <link rel="stylesheet" href="css/styles.css"/>
+</head>
+<body>
+    <h1>Linux Manual - Package Management</h1>
+
+    <div class="search-container">
+        <input type="text" id="search" placeholder="Search package managers or commands...">
+        <select id="category-filter">
+            <option value="all">All Categories</option>
+            <option value="apt">APT (Debian/Ubuntu)</option>
+            <option value="dnf-yum">DNF/YUM (RHEL/Fedora)</option>
+            <option value="pacman">Pacman (Arch)</option>
+            <option value="zypper">Zypper (SUSE)</option>
+            <option value="snap-flatpak">Snap/Flatpak</option>
+            </select>
+        <button id="reset">Reset</button>
+    </div>
+
+    <div class="command-list" id="content-list">
+        </div>
+
+    <div class="bottom-back-to-index-container">
+        <a href="../index.html" class="back-to-index-btn">&larr; Back to Main Index</a>
+    </div>
+
+    <footer>
+        Package Management - Linux Manual
+    </footer>
+
+    <script>
+        const packageManagementData = [
+            // APT (Debian/Ubuntu)
+            {
+                name: "apt update",
+                syntax: "apt update",
+                description: "Resynchronizes the package index files from their sources.",
+                examples: "sudo apt update",
+                level: "basic",
+                category: "apt",
+                tags: ["apt", "package", "update", "index", "debian", "ubuntu"]
+            },
+            {
+                name: "apt upgrade",
+                syntax: "apt upgrade",
+                description: "Upgrades all currently installed packages to their newest versions.",
+                examples: "sudo apt upgrade\nsudo apt full-upgrade # Also removes packages if needed to complete upgrade",
+                level: "basic",
+                category: "apt",
+                tags: ["apt", "package", "upgrade", "debian", "ubuntu"]
+            },
+            {
+                name: "apt install [package]",
+                syntax: "apt install nginx",
+                description: "Installs a new package and its dependencies.",
+                examples: "sudo apt install htop vim-gtk3\nsudo apt install --reinstall coreutils",
+                level: "basic",
+                category: "apt",
+                tags: ["apt", "package", "install", "debian", "ubuntu"]
+            },
+            {
+                name: "apt remove [package]",
+                syntax: "apt remove nginx",
+                description: "Removes a package but leaves configuration files.",
+                examples: "sudo apt remove htop",
+                level: "basic",
+                category: "apt",
+                tags: ["apt", "package", "remove", "debian", "ubuntu"]
+            },
+            {
+                name: "apt purge [package]",
+                syntax: "apt purge nginx",
+                description: "Removes a package and its configuration files.",
+                examples: "sudo apt purge htop",
+                level: "intermediate",
+                category: "apt",
+                tags: ["apt", "package", "purge", "remove", "config", "debian", "ubuntu"]
+            },
+            {
+                name: "apt autoremove",
+                syntax: "apt autoremove",
+                description: "Removes packages that were automatically installed to satisfy dependencies for other packages and are now no longer needed.",
+                examples: "sudo apt autoremove",
+                level: "intermediate",
+                category: "apt",
+                tags: ["apt", "package", "autoremove", "cleanup", "dependencies", "debian", "ubuntu"]
+            },
+            {
+                name: "apt search [keyword]",
+                syntax: "apt search web server",
+                description: "Searches for packages matching the keyword in package names and descriptions.",
+                examples: "apt search python3-django\napt-cache search text editor # Older alternative",
+                level: "basic",
+                category: "apt",
+                tags: ["apt", "package", "search", "find", "debian", "ubuntu"]
+            },
+            {
+                name: "apt show [package]",
+                syntax: "apt show nginx",
+                description: "Shows detailed information about a package.",
+                examples: "apt show htop",
+                level: "basic",
+                category: "apt",
+                tags: ["apt", "package", "info", "details", "debian", "ubuntu"]
+            },
+            {
+                name: "apt list --installed",
+                syntax: "apt list --installed",
+                description: "Lists all installed packages.",
+                examples: "apt list --installed | grep vim\napt list --upgradable # List packages with available upgrades",
+                level: "intermediate",
+                category: "apt",
+                tags: ["apt", "package", "list", "installed", "debian", "ubuntu"]
+            },
+            // DNF/YUM (RHEL/Fedora/CentOS)
+            {
+                name: "dnf check-update",
+                syntax: "dnf check-update",
+                description: "Checks for available package updates from enabled repositories.",
+                examples: "sudo dnf check-update",
+                level: "basic",
+                category: "dnf-yum",
+                tags: ["dnf", "yum", "package", "update", "check", "fedora", "rhel", "centos"]
+            },
+            {
+                name: "dnf upgrade",
+                syntax: "dnf upgrade",
+                description: "Upgrades all packages with available updates. Use 'dnf upgrade [package]' to upgrade a specific package.",
+                examples: "sudo dnf upgrade -y\nsudo dnf upgrade kernel",
+                level: "basic",
+                category: "dnf-yum",
+                tags: ["dnf", "yum", "package", "upgrade", "fedora", "rhel", "centos"]
+            },
+            {
+                name: "dnf install [package]",
+                syntax: "dnf install httpd",
+                description: "Installs a new package and its dependencies.",
+                examples: "sudo dnf install tmux vim",
+                level: "basic",
+                category: "dnf-yum",
+                tags: ["dnf", "yum", "package", "install", "fedora", "rhel", "centos"]
+            },
+            {
+                name: "dnf remove [package]",
+                syntax: "dnf remove httpd",
+                description: "Removes a package.",
+                examples: "sudo dnf remove tmux",
+                level: "basic",
+                category: "dnf-yum",
+                tags: ["dnf", "yum", "package", "remove", "fedora", "rhel", "centos"]
+            },
+            {
+                name: "dnf autoremove",
+                syntax: "dnf autoremove",
+                description: "Removes packages that were installed as dependencies but are no longer needed.",
+                examples: "sudo dnf autoremove",
+                level: "intermediate",
+                category: "dnf-yum",
+                tags: ["dnf", "yum", "package", "autoremove", "cleanup", "dependencies", "fedora", "rhel", "centos"]
+            },
+            {
+                name: "dnf search [keyword]",
+                syntax: "dnf search webserver",
+                description: "Searches for packages matching the keyword.",
+                examples: "dnf search python-django",
+                level: "basic",
+                category: "dnf-yum",
+                tags: ["dnf", "yum", "package", "search", "find", "fedora", "rhel", "centos"]
+            },
+            {
+                name: "dnf info [package]",
+                syntax: "dnf info httpd",
+                description: "Shows detailed information about a package.",
+                examples: "dnf info tmux",
+                level: "basic",
+                category: "dnf-yum",
+                tags: ["dnf", "yum", "package", "info", "details", "fedora", "rhel", "centos"]
+            },
+            {
+                name: "dnf list installed",
+                syntax: "dnf list installed",
+                description: "Lists all installed packages.",
+                examples: "dnf list installed | grep vim",
+                level: "intermediate",
+                category: "dnf-yum",
+                tags: ["dnf", "yum", "package", "list", "installed", "fedora", "rhel", "centos"]
+            },
+            {
+                name: "dnf history",
+                syntax: "dnf history",
+                description: "Displays a history of DNF transactions, allowing rollback.",
+                examples: "sudo dnf history list\nsudo dnf history info 10\nsudo dnf history undo 10",
+                level: "advanced",
+                category: "dnf-yum",
+                tags: ["dnf", "yum", "package", "history", "rollback", "transaction", "fedora", "rhel", "centos"]
+            },
+            // Pacman (Arch)
+            {
+                name: "pacman -Syu",
+                syntax: "pacman -Syu",
+                description: "Synchronizes package databases and upgrades all installed packages (SystemyellUpdate).",
+                examples: "sudo pacman -Syu",
+                level: "basic",
+                category: "pacman",
+                tags: ["pacman", "package", "update", "upgrade", "arch linux"]
+            },
+            {
+                name: "pacman -S [package]",
+                syntax: "pacman -S firefox",
+                description: "Installs a new package (Synchronize).",
+                examples: "sudo pacman -S vim htop",
+                level: "basic",
+                category: "pacman",
+                tags: ["pacman", "package", "install", "arch linux"]
+            },
+            {
+                name: "pacman -R [package]",
+                syntax: "pacman -R firefox",
+                description: "Removes a package (Remove).",
+                examples: "sudo pacman -R vim\nsudo pacman -Rns $(pacman -Qtdq) # Remove orphans and their configs",
+                level: "basic",
+                category: "pacman",
+                tags: ["pacman", "package", "remove", "arch linux"]
+            },
+            {
+                name: "pacman -Ss [keyword]",
+                syntax: "pacman -Ss browser",
+                description: "Searches for packages in the repositories (Search sync).",
+                examples: "pacman -Ss python django",
+                level: "basic",
+                category: "pacman",
+                tags: ["pacman", "package", "search", "find", "arch linux"]
+            },
+            {
+                name: "pacman -Qi [package]",
+                syntax: "pacman -Qi firefox",
+                description: "Displays detailed information about an installed package (Query info).",
+                examples: "pacman -Qi vim\n pacman -Si community/htop # Info for repo package",
+                level: "basic",
+                category: "pacman",
+                tags: ["pacman", "package", "info", "details", "arch linux"]
+            },
+            // Zypper (SUSE)
+            {
+                name: "zypper refresh",
+                syntax: "zypper refresh",
+                description: "Refreshes all configured repositories.",
+                examples: "sudo zypper refresh",
+                level: "basic",
+                category: "zypper",
+                tags: ["zypper", "package", "refresh", "repositories", "suse", "opensuse"]
+            },
+            {
+                name: "zypper update",
+                syntax: "zypper update",
+                description: "Updates all installed packages with newer versions.",
+                examples: "sudo zypper update",
+                level: "basic",
+                category: "zypper",
+                tags: ["zypper", "package", "update", "upgrade", "suse", "opensuse"]
+            },
+            {
+                name: "zypper install [package]",
+                syntax: "zypper install firefox",
+                description: "Installs a new package.",
+                examples: "sudo zypper install vim htop",
+                level: "basic",
+                category: "zypper",
+                tags: ["zypper", "package", "install", "suse", "opensuse"]
+            },
+            {
+                name: "zypper remove [package]",
+                syntax: "zypper remove firefox",
+                description: "Removes a package.",
+                examples: "sudo zypper remove vim",
+                level: "basic",
+                category: "zypper",
+                tags: ["zypper", "package", "remove", "suse", "opensuse"]
+            },
+            {
+                name: "zypper search [keyword]",
+                syntax: "zypper search browser",
+                description: "Searches for packages.",
+                examples: "zypper search python-django",
+                level: "basic",
+                category: "zypper",
+                tags: ["zypper", "package", "search", "find", "suse", "opensuse"]
+            },
+            // Snap/Flatpak
+            {
+                name: "snap find [keyword]",
+                syntax: "snap find vlc",
+                description: "Finds snaps available in the store.",
+                examples: "snap find spotify\nsnap find \"text editor\"",
+                level: "basic",
+                category: "snap-flatpak",
+                tags: ["snap", "package", "find", "search", "universal", "sandboxed"]
+            },
+            {
+                name: "snap install [snap_name]",
+                syntax: "snap install vlc",
+                description: "Installs a snap package.",
+                examples: "sudo snap install spotify",
+                level: "basic",
+                category: "snap-flatpak",
+                tags: ["snap", "package", "install", "universal", "sandboxed"]
+            },
+            {
+                name: "snap list",
+                syntax: "snap list",
+                description: "Lists installed snap packages.",
+                examples: "snap list",
+                level: "basic",
+                category: "snap-flatpak",
+                tags: ["snap", "package", "list", "installed", "universal"]
+            },
+            {
+                name: "snap remove [snap_name]",
+                syntax: "snap remove vlc",
+                description: "Removes a snap package.",
+                examples: "sudo snap remove spotify",
+                level: "basic",
+                category: "snap-flatpak",
+                tags: ["snap", "package", "remove", "universal"]
+            },
+            {
+                name: "flatpak search [keyword]",
+                syntax: "flatpak search gimp",
+                description: "Searches for applications and runtimes in configured remotes.",
+                examples: "flatpak search libreoffice",
+                level: "basic",
+                category: "snap-flatpak",
+                tags: ["flatpak", "package", "search", "find", "universal", "sandboxed"]
+            },
+            {
+                name: "flatpak install [remote] [app_id]",
+                syntax: "flatpak install flathub org.gimp.GIMP",
+                description: "Installs a Flatpak application.",
+                examples: "sudo flatpak install flathub org.libreoffice.LibreOffice",
+                level: "basic",
+                category: "snap-flatpak",
+                tags: ["flatpak", "package", "install", "universal", "sandboxed"]
+            },
+            {
+                name: "flatpak list",
+                syntax: "flatpak list",
+                description: "Lists installed Flatpak applications and runtimes.",
+                examples: "flatpak list --app # List only applications",
+                level: "basic",
+                category: "snap-flatpak",
+                tags: ["flatpak", "package", "list", "installed", "universal"]
+            },
+            {
+                name: "flatpak uninstall [app_id]",
+                syntax: "flatpak uninstall org.gimp.GIMP",
+                description: "Uninstalls a Flatpak application.",
+                examples: "sudo flatpak uninstall org.libreoffice.LibreOffice",
+                level: "basic",
+                category: "snap-flatpak",
+                tags: ["flatpak", "package", "remove", "universal"]
+            }
+        ];
+
+        const sectionItems = packageManagementData; // This line is crucial
+
+        function getCategoryDisplayName(category) {
+            const categories = {
+                'apt': 'APT (Debian/Ubuntu)',
+                'dnf-yum': 'DNF/YUM (RHEL/Fedora)',
+                'pacman': 'Pacman (Arch)',
+                'zypper': 'Zypper (SUSE)',
+                'snap-flatpak': 'Snap/Flatpak'
+            };
+            return categories[category] || category.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        function renderItems(itemsToRender) {
+            const itemListElement = document.getElementById('content-list');
+            itemListElement.innerHTML = '';
+
+            if (itemsToRender.length === 0) {
+                itemListElement.innerHTML = `<div class="no-results"><h3>No entries found</h3><p>Try adjusting your search criteria.</p></div>`;
+                return;
+            }
+
+            itemsToRender.forEach(item => {
+                const itemCard = document.createElement('div');
+                itemCard.className = 'command-card';
+
+                const typeClass = item.level ? (item.level === 'basic' ? 'basic' : item.level === 'intermediate' ? 'intermediate' : 'advanced') : 'standard';
+
+                itemCard.innerHTML = `
+                    <div class="command-name">${item.name}</div>
+                    <div class="command-tags">
+                        ${item.category ? `<span class="category">${getCategoryDisplayName(item.category)}</span>` : ''}
+                        <span class="level ${typeClass}">${item.level || 'standard'}</span>
+                    </div>
+                    ${item.syntax ? `<div class="command-syntax">${item.syntax.replace(/\n/g, '<br>')}</div>` : ''}
+                    <div class="command-description">${item.description}</div>
+                    ${item.examples ? `<div class="command-example"><strong>Details/Examples:</strong><br>${item.examples.replace(/\n/g, '<br>')}</div>` : ''}
+                    ${item.manLink ? `<div class="learn-more"><a href="${item.manLink}" target="_blank">Learn More</a></div>` : ''}
+                `;
+                itemListElement.appendChild(itemCard);
+            });
+        }
+
+        function filterItems() {
+            const searchTerm = document.getElementById('search').value.toLowerCase();
+            const categoryFilter = document.getElementById('category-filter').value;
+
+            const filteredItems = sectionItems.filter(item => {
+                const searchMatch =
+                    item.name.toLowerCase().includes(searchTerm) ||
+                    item.description.toLowerCase().includes(searchTerm) ||
+                    (item.tags && item.tags.some(tag => tag.toLowerCase().includes(searchTerm))) ||
+                    (item.syntax && item.syntax.toLowerCase().includes(searchTerm)) ||
+                    (item.examples && item.examples.toLowerCase().includes(searchTerm));
+
+                const categoryMatch = categoryFilter === 'all' || item.category === categoryFilter;
+
+                return searchMatch && categoryMatch;
+            });
+
+            renderItems(filteredItems);
+        }
+
+        document.getElementById('search').addEventListener('input', filterItems);
+        document.getElementById('category-filter').addEventListener('change', filterItems);
+        document.getElementById('reset').addEventListener('click', () => {
+            document.getElementById('search').value = '';
+            document.getElementById('category-filter').value = 'all';
+            renderItems(sectionItems);
+        });
+
+        renderItems(sectionItems); // Initial render
+    </script>
+</body>
+</html>

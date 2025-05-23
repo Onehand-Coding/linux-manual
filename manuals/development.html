@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux Manual - Development</title>
+    <link rel="stylesheet" href="css/styles.css"/>
+</head>
+<body>
+    <h1>Linux Manual - Development</h1>
+
+    <div class="search-container">
+        <input type="text" id="search" placeholder="Search development topics...">
+        <select id="category-filter">
+            <option value="all">All Categories</option>
+            <option value="git">Git</option>
+            <option value="containers">Containers (Docker/Podman)</option>
+            <option value="kubernetes">Kubernetes (kubectl)</option>
+            </select>
+        <button id="reset">Reset</button>
+    </div>
+
+    <div class="command-list" id="content-list">
+        </div>
+
+    <div class="bottom-back-to-index-container">
+        <a href="../index.html" class="back-to-index-btn">&larr; Back to Main Index</a>
+    </div>
+
+    <footer>
+        Development - Linux Manual
+    </footer>
+
+    <script>
+        const developmentData = [
+            // Git Quick Reference
+            {
+                name: "Git Basic Workflow",
+                description: "Common sequence of commands for daily Git usage.",
+                category: "git",
+                level: "basic",
+                examples: "git clone <repository_url> # Clone a repository\ngit status # Check status\ngit add <file_or_directory> # Stage changes\ngit add . # Stage all changes\ngit commit -m \"Commit message\" # Commit staged changes\ngit pull # Fetch and merge changes from remote\ngit push # Push local commits to remote",
+                tags: ["git", "vcs", "workflow", "basics", "source control"]
+            },
+            {
+                name: "Git Branching & Merging",
+                description: "Working with branches in Git.",
+                category: "git",
+                level: "intermediate",
+                examples: "git branch # List branches\ngit branch <new_branch_name> # Create a new branch\ngit checkout <branch_name> # Switch to a branch (or git switch <branch_name>)\ngit checkout -b <new_branch_name> # Create and switch to a new branch (or git switch -c <new_branch_name>)\ngit merge <branch_to_merge> # Merge changes from another branch into current\ngit branch -d <branch_name> # Delete a local branch (if merged)\ngit push origin --delete <remote_branch_name> # Delete a remote branch",
+                tags: ["git", "branch", "merge", "vcs", "collaboration", "source control"]
+            },
+            {
+                name: "Git Rebasing (Advanced)",
+                description: "Replaying commits from one branch onto another, often to maintain a linear history.",
+                category: "git",
+                level: "advanced",
+                examples: "git checkout feature_branch\ngit rebase main # Rebase feature_branch onto main\n  (Resolve conflicts if any, then 'git add <files>', 'git rebase --continue')\ngit rebase -i HEAD~3 # Interactive rebase for last 3 commits (squash, reword, edit, etc.)\nCaution: Do not rebase branches that others have pulled unless coordinated.",
+                tags: ["git", "rebase", "vcs", "history rewriting", "advanced", "source control"]
+            },
+            {
+                name: "Git Submodules",
+                description: "Allows you to keep a Git repository as a subdirectory of another Git repository.",
+                category: "git",
+                level: "advanced",
+                examples: "git submodule add <repository_url> path/to/submodule\ngit submodule init # Initialize submodules (after clone)\ngit submodule update # Update submodules to commit specified in parent repo\ngit submodule update --remote # Update submodules to latest from their remote branch",
+                tags: ["git", "submodule", "vcs", "dependencies", "advanced", "source control"]
+            },
+            // Containers
+            {
+                name: "Docker/Podman Command Comparison (Common Ops)",
+                description: "Key commands for Docker and its daemonless alternative Podman.",
+                category: "containers",
+                level: "intermediate",
+                examples: "Build image:\n  docker build -t myimage:latest .\n  podman build -t myimage:latest .\nRun container:\n  docker run -d -p 8080:80 myimage\n  podman run -d -p 8080:80 myimage\nList running containers:\n  docker ps\n  podman ps\nList all containers:\n  docker ps -a\n  podman ps -a\nList images:\n  docker images\n  podman images\nStop container:\n  docker stop <container_id_or_name>\n  podman stop <container_id_or_name>\nRemove container:\n  docker rm <container_id_or_name>\n  podman rm <container_id_or_name>\nRemove image:\n  docker rmi <image_id_or_name>\n  podman rmi <image_id_or_name>",
+                tags: ["docker", "podman", "containers", "virtualization", "devops", "comparison"]
+            },
+            {
+                name: "Dockerfile Basics",
+                description: "Common instructions used in a Dockerfile to build container images.",
+                category: "containers",
+                level: "intermediate",
+                examples: "FROM ubuntu:latest # Base image\nLABEL maintainer=\"you@example.com\"\nWORKDIR /app # Set working directory\nCOPY . /app # Copy files from build context to image\nRUN apt-get update && apt-get install -y python3 # Run commands during build\nENV MY_VAR=\"my_value\" # Set environment variable\nEXPOSE 8000 # Document port container listens on\nCMD [\"python3\", \"app.py\"] # Default command to run when container starts",
+                tags: ["docker", "podman", "dockerfile", "containers", "image build", "devops"]
+            },
+            {
+                name: "docker-compose / compose (Podman)",
+                description: "Tool for defining and running multi-container Docker applications.",
+                category: "containers",
+                level: "intermediate",
+                examples: "docker-compose.yml structure:\n  version: '3.8'\n  services:\n    web:\n      image: nginx:latest\n      ports:\n        - \"80:80\"\n    app:\n      build: .\n      depends_on:\n        - db\n    db:\n      image: postgres:13\nCommands:\n  docker-compose up -d # Start services in detached mode\n  docker-compose down # Stop and remove containers, networks\n  docker-compose ps # List services\n  docker-compose logs -f app # Follow logs for 'app' service\n(For Podman, use 'podman-compose' or built-in 'podman compose')",
+                tags: ["docker-compose", "podman-compose", "containers", "orchestration", "multi-container", "devops"]
+            },
+            // Kubernetes (kubectl)
+            {
+                name: "kubectl Cheat Sheet (Common Commands)",
+                description: "Essential kubectl commands for interacting with a Kubernetes cluster.",
+                category: "kubernetes",
+                level: "advanced",
+                examples: "kubectl get nodes # List nodes\nkubectl get pods -n <namespace> # List pods in a namespace\nkubectl describe pod <pod_name> # Get details of a pod\nkubectl logs <pod_name> -c <container_name> # View logs\nkubectl exec -it <pod_name> -- /bin/bash # Execute command in a pod\nkubectl apply -f manifest.yaml # Apply a configuration\nkubectl delete -f manifest.yaml # Delete resources\nkubectl get services # List services\nkubectl config view # View current kubeconfig\nkubectl config use-context <context_name> # Switch context",
+                tags: ["kubernetes", "kubectl", "orchestration", "containers", "devops", "cluster"]
+            }
+        ];
+
+        const sectionItems = developmentData; // This line is crucial
+
+        function getCategoryDisplayName(category) {
+            const categories = {
+                'git': 'Git',
+                'containers': 'Containers (Docker/Podman)',
+                'kubernetes': 'Kubernetes (kubectl)'
+            };
+            return categories[category] || category.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        function renderItems(itemsToRender) {
+            const itemListElement = document.getElementById('content-list');
+            itemListElement.innerHTML = '';
+
+            if (itemsToRender.length === 0) {
+                itemListElement.innerHTML = `<div class="no-results"><h3>No entries found</h3><p>Try adjusting your search criteria.</p></div>`;
+                return;
+            }
+
+            itemsToRender.forEach(item => {
+                const itemCard = document.createElement('div');
+                itemCard.className = 'command-card';
+
+                const typeClass = item.level ? (item.level === 'basic' ? 'basic' : item.level === 'intermediate' ? 'intermediate' : 'advanced') : 'standard';
+
+                itemCard.innerHTML = `
+                    <div class="command-name">${item.name}</div>
+                    <div class="command-tags">
+                        ${item.category ? `<span class="category">${getCategoryDisplayName(item.category)}</span>` : ''}
+                        <span class="level ${typeClass}">${item.level || 'standard'}</span>
+                    </div>
+                    ${item.syntax ? `<div class="command-syntax">${item.syntax.replace(/\n/g, '<br>')}</div>` : ''}
+                    <div class="command-description">${item.description}</div>
+                    ${item.examples ? `<div class="command-example"><strong>Details/Examples:</strong><br>${item.examples.replace(/\n/g, '<br>')}</div>` : ''}
+                    ${item.manLink ? `<div class="learn-more"><a href="${item.manLink}" target="_blank">Learn More</a></div>` : ''}
+                `;
+                itemListElement.appendChild(itemCard);
+            });
+        }
+
+        function filterItems() {
+            const searchTerm = document.getElementById('search').value.toLowerCase();
+            const categoryFilter = document.getElementById('category-filter').value;
+
+            const filteredItems = sectionItems.filter(item => {
+                const searchMatch =
+                    item.name.toLowerCase().includes(searchTerm) ||
+                    item.description.toLowerCase().includes(searchTerm) ||
+                    (item.tags && item.tags.some(tag => tag.toLowerCase().includes(searchTerm))) ||
+                    (item.syntax && item.syntax.toLowerCase().includes(searchTerm)) ||
+                    (item.examples && item.examples.toLowerCase().includes(searchTerm));
+
+                const categoryMatch = categoryFilter === 'all' || item.category === categoryFilter;
+
+                return searchMatch && categoryMatch;
+            });
+
+            renderItems(filteredItems);
+        }
+
+        document.getElementById('search').addEventListener('input', filterItems);
+        document.getElementById('category-filter').addEventListener('change', filterItems);
+        document.getElementById('reset').addEventListener('click', () => {
+            document.getElementById('search').value = '';
+            document.getElementById('category-filter').value = 'all';
+            renderItems(sectionItems);
+        });
+
+        renderItems(sectionItems); // Initial render
+    </script></body>
+</html>

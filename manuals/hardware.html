@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux Manual - Hardware</title>
+    <link rel="stylesheet" href="css/styles.css"/>
+</head>
+<body>
+    <h1>Linux Manual - Hardware</h1>
+
+    <div class="search-container">
+        <input type="text" id="search" placeholder="Search hardware topics...">
+        <select id="category-filter">
+            <option value="all">All Categories</option>
+            <option value="pci-usb">PCI/USB Devices</option>
+            <option value="smart-monitoring">S.M.A.R.T. Monitoring</option>
+            </select>
+        <button id="reset">Reset</button>
+    </div>
+
+    <div class="command-list" id="content-list">
+        </div>
+
+    <div class="bottom-back-to-index-container">
+        <a href="../index.html" class="back-to-index-btn">&larr; Back to Main Index</a>
+    </div>
+
+    <footer>
+        Hardware - Linux Manual
+    </footer>
+
+    <script>
+        const hardwareData = [
+            // PCI/USB Devices
+            {
+                name: "lspci",
+                syntax: "lspci [options]",
+                description: "Lists all PCI buses and devices in the system.",
+                examples: "lspci\nlspci -v # Verbose output\nlspci -vv # More verbose\nlspci -k # Show kernel drivers handling each device\nlspci -nnk # Show numeric IDs and kernel drivers\nlspci -s 00:02.0 # Show info for specific device",
+                level: "basic",
+                category: "pci-usb",
+                tags: ["lspci", "pci", "hardware", "devices", "diagnostics"]
+            },
+            {
+                name: "lsusb",
+                syntax: "lsusb [options]",
+                description: "Lists all USB buses and devices connected to the system.",
+                examples: "lsusb\nlsusb -v # Verbose output\nlsusb -t # Show USB device hierarchy as a tree\nlsusb -D /dev/bus/usb/001/002 # Show info for specific device file",
+                level: "basic",
+                category: "pci-usb",
+                tags: ["lsusb", "usb", "hardware", "devices", "diagnostics"]
+            },
+            {
+                name: "udev & udevadm",
+                description: "udev is the device manager for the Linux kernel. `udevadm` is used to manage udev.",
+                category: "pci-usb",
+                level: "advanced",
+                examples: "udev rules are typically in /etc/udev/rules.d/ or /usr/lib/udev/rules.d/.\nExample udev rule (e.g., 99-mydevice.rules):\n  SUBSYSTEM==\"usb\", ATTRS{idVendor}==\"xxxx\", ATTRS{idProduct}==\"yyyy\", MODE=\"0666\", GROUP=\"plugdev\"\n\nudevadm info -a -p $(udevadm info -q path -n /dev/sda) # Show all attributes for /dev/sda\nudevadm monitor # Monitor udev events\nudevadm trigger # Request uevents from kernel for all devices\nudevadm control --reload-rules && udevadm trigger # Reload rules and re-trigger",
+                tags: ["udev", "udevadm", "hardware", "device management", "rules", "kernel"]
+            },
+            // SMART Monitoring
+            {
+                name: "smartctl (S.M.A.R.T. Monitoring)",
+                syntax: "smartctl [options] [device]",
+                description: "Controls and monitors Self-Monitoring, Analysis and Reporting Technology (S.M.A.R.T.) for hard drives and SSDs.",
+                category: "smart-monitoring",
+                level: "intermediate",
+                examples: "sudo smartctl -i /dev/sda # Display device identity and SMART capability\nsudo smartctl -H /dev/sda # Check overall health status\nsudo smartctl -A /dev/sda # Display all SMART attributes\nsudo smartctl -a /dev/sda # Display all SMART information (identity, attributes, error logs)\nsudo smartctl -t short /dev/sda # Run a short self-test\nsudo smartctl -t long /dev/sda # Run a long self-test\nsudo smartctl -l selftest /dev/sda # Display self-test log",
+                tags: ["smartctl", "smart", "disk health", "hdd", "ssd", "monitoring", "diagnostics"]
+            },
+            {
+                name: "Interpreting SMART Attributes",
+                description: "Key S.M.A.R.T. attributes and what they might indicate about disk health. Values are vendor-specific but trends matter.",
+                category: "smart-monitoring",
+                level: "advanced",
+                examples: "Common attributes to watch (names may vary slightly):\n  Raw_Read_Error_Rate: Rate of hardware read errors.\n  Reallocated_Sector_Ct: Count of remapped bad sectors. (Important! Increasing is bad)\n  Seek_Error_Rate: Rate of seek errors.\n  Spin_Retry_Count: Number of retries during disk spin-up. (Increasing is bad)\n  Current_Pending_Sector_Ct: Unstable sectors awaiting remapping. (Important! >0 is a concern)\n  Offline_Uncorrectable: Count of uncorrectable errors during offline scans.\n  Temperature_Celsius: Drive temperature.\n  UDMA_CRC_Error_Count: Errors in data transfer over the interface cable (check cable if high).",
+                tags: ["smart", "disk health", "attributes", "hdd", "ssd", "monitoring", "interpretation"]
+            }
+        ];
+
+        const sectionItems = hardwareData; // This line is crucial
+
+        function getCategoryDisplayName(category) {
+            const categories = {
+                'pci-usb': 'PCI/USB Devices',
+                'smart-monitoring': 'S.M.A.R.T. Monitoring'
+            };
+            return categories[category] || category.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        function renderItems(itemsToRender) {
+            const itemListElement = document.getElementById('content-list');
+            itemListElement.innerHTML = '';
+
+            if (itemsToRender.length === 0) {
+                itemListElement.innerHTML = `<div class="no-results"><h3>No entries found</h3><p>Try adjusting your search criteria.</p></div>`;
+                return;
+            }
+
+            itemsToRender.forEach(item => {
+                const itemCard = document.createElement('div');
+                itemCard.className = 'command-card';
+
+                const typeClass = item.level ? (item.level === 'basic' ? 'basic' : item.level === 'intermediate' ? 'intermediate' : 'advanced') : 'standard';
+
+                itemCard.innerHTML = `
+                    <div class="command-name">${item.name}</div>
+                    <div class="command-tags">
+                        ${item.category ? `<span class="category">${getCategoryDisplayName(item.category)}</span>` : ''}
+                        <span class="level ${typeClass}">${item.level || 'standard'}</span>
+                    </div>
+                    ${item.syntax ? `<div class="command-syntax">${item.syntax.replace(/\n/g, '<br>')}</div>` : ''}
+                    <div class="command-description">${item.description}</div>
+                    ${item.examples ? `<div class="command-example"><strong>Details/Examples:</strong><br>${item.examples.replace(/\n/g, '<br>')}</div>` : ''}
+                    ${item.manLink ? `<div class="learn-more"><a href="${item.manLink}" target="_blank">Learn More</a></div>` : ''}
+                `;
+                itemListElement.appendChild(itemCard);
+            });
+        }
+
+        function filterItems() {
+            const searchTerm = document.getElementById('search').value.toLowerCase();
+            const categoryFilter = document.getElementById('category-filter').value;
+
+            const filteredItems = sectionItems.filter(item => {
+                const searchMatch =
+                    item.name.toLowerCase().includes(searchTerm) ||
+                    item.description.toLowerCase().includes(searchTerm) ||
+                    (item.tags && item.tags.some(tag => tag.toLowerCase().includes(searchTerm))) ||
+                    (item.syntax && item.syntax.toLowerCase().includes(searchTerm)) ||
+                    (item.examples && item.examples.toLowerCase().includes(searchTerm));
+
+                const categoryMatch = categoryFilter === 'all' || item.category === categoryFilter;
+
+                return searchMatch && categoryMatch;
+            });
+
+            renderItems(filteredItems);
+        }
+
+        document.getElementById('search').addEventListener('input', filterItems);
+        document.getElementById('category-filter').addEventListener('change', filterItems);
+        document.getElementById('reset').addEventListener('click', () => {
+            document.getElementById('search').value = '';
+            document.getElementById('category-filter').value = 'all';
+            renderItems(sectionItems);
+        });
+
+        renderItems(sectionItems); // Initial render
+    </script>
+</body>
+</html>

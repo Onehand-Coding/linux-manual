@@ -1,0 +1,379 @@
+:root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --primary-color: #bb86fc;
+            --primary-dark: #3700b3;
+            --secondary-color: #03dac6;
+            --error-color: #cf6679;
+            --border-color: #333;
+            --hover-color: #2a2a2a;
+            --warning-color: #ff8f00;
+            --system-color: #1565c0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--bg-color);
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+            margin-top: 40px;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input, select, button {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+        }
+
+        input {
+            flex-grow: 1;
+        }
+
+        button {
+            background-color: var(--primary-dark);
+            color: white;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--primary-color);
+        }
+
+        .filesystem-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .dir-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            padding: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid var(--border-color);
+        }
+
+        .dir-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+            background-color: var(--hover-color);
+        }
+
+        .dir-name {
+            font-weight: bold;
+            color: var(--secondary-color);
+            margin-bottom: 5px;
+            font-size: 1.2em;
+            font-family: monospace;
+        }
+
+        .dir-path {
+            font-family: monospace;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+
+        .dir-description {
+            margin-bottom: 10px;
+            color: var(--text-secondary);
+        }
+
+        .dir-contents {
+            margin-top: 10px;
+        }
+
+        .dir-contents h4 {
+            color: var(--primary-color);
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        .dir-contents ul {
+            padding-left: 20px;
+            margin: 0;
+            font-size: 0.9em;
+        }
+
+        .dir-contents li {
+            margin-bottom: 3px;
+            color: var(--text-color);
+        }
+
+        .dir-contents li code {
+            background-color: rgba(30, 30, 30, 0.7);
+            padding: 2px 4px;
+            border-radius: 3px;
+            color: var(--secondary-color);
+            font-family: monospace;
+        }
+
+        .importance {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            margin-right: 5px;
+            font-weight: bold;
+        }
+
+        .critical {
+            background-color: var(--error-color);
+            color: white;
+        }
+
+        .important {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .standard {
+            background-color: var(--system-color);
+            color: white;
+        }
+
+        .no-results {
+            text-align: center;
+            grid-column: 1 / -1;
+            padding: 20px;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .config-files {
+            margin-top: 30px;
+        }
+
+        .config-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .config-table th, .config-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .config-table th {
+            background-color: var(--card-bg);
+            color: var(--primary-color);
+        }
+
+        .config-table tr:hover {
+            background-color: var(--hover-color);
+        }
+
+        .config-table code {
+            background-color: rgba(30, 30, 30, 0.7);
+            padding: 2px 4px;
+            border-radius: 3px;
+            color: var(--secondary-color);
+            font-family: monospace;
+        }
+
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--card-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-dark);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-color);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .command-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .command-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            padding: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid var(--border-color);
+        }
+
+        .command-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+            background-color: var(--hover-color);
+        }
+
+        .command-name {
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+            font-size: 1.2em;
+        }
+
+        .command-syntax {
+            font-family: monospace;
+            background-color: rgba(30, 30, 30, 0.7);
+            padding: 8px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            overflow-x: auto;
+            color: var(--secondary-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .command-description {
+            margin-bottom: 10px;
+            color: var(--text-secondary);
+        }
+
+        .command-example {
+            font-family: monospace;
+            background-color: rgba(40, 40, 40, 0.7);
+            padding: 8px;
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow-x: auto;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .command-example strong {
+            color: var(--text-secondary);
+        }
+
+        .level {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            margin-right: 5px;
+            font-weight: bold;
+        }
+
+        .basic {
+            background-color: #2e7d32;
+            color: white;
+        }
+
+        .intermediate {
+            background-color: #ff8f00;
+            color: white;
+        }
+
+        .advanced {
+            background-color: #c62828;
+            color: white;
+        }
+
+        .category {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            background-color: #1565c0;
+            color: white;
+            font-weight: bold;
+        }
+
+        .command-tags {
+            margin-bottom: 10px;
+        }
+
+        .learn-more {
+            text-align: right;
+            margin-top: 10px;
+        }
+
+        .learn-more a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .learn-more a:hover {
+            text-decoration: underline;
+            color: var(--primary-color);
+        }
+
+
+        /* Container for the 'Back to Index' button at the bottom */
+.bottom-back-to-index-container {
+    text-align: center; /* Centers the button */
+    margin-top: 40px;   /* Space above the button */
+    margin-bottom: 20px;/* Space below the button, before the footer */
+    padding-top: 20px;  /* Optional: add some padding if you want a separator line */
+    border-top: 1px solid var(--border-color); /* Optional: visual separator line */
+}
+
+/* Styling for the 'Back to Index' button itself (if not already in styles.css) */
+/* You can reuse or adapt the .back-to-index-btn style I provided earlier */
+.back-to-index-btn { /* Renaming to avoid conflict if you had a top one, or keep if it's the same style */
+    display: inline-block;
+    padding: 12px 25px; /* Slightly larger for a bottom button */
+    background-color: var(--primary-dark); /* Consistent with other buttons */
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 1em; /* Slightly larger */
+    font-weight: bold;
+    transition: background-color 0.2s, color 0.2s;
+    border: none; /* Consistent with other buttons */
+}
+.back-to-index-btn:hover {
+    background-color: var(--primary-color);
+}

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux Manual - Shell & Scripting</title>
+    <link rel="stylesheet" href="css/styles.css"/>
+</head>
+<body>
+    <h1>Linux Manual - Shell & Scripting</h1>
+
+    <div class="search-container">
+        <input type="text" id="search" placeholder="Search shell topics...">
+        <select id="category-filter">
+            <option value="all">All Categories</option>
+            <option value="bash-reference">Bash Reference</option>
+            <option value="text-processing">Text Processing</option>
+            <option value="cli-tools">CLI Tools</option>
+            </select>
+        <button id="reset">Reset</button>
+    </div>
+
+    <div class="command-list" id="content-list">
+        </div>
+
+    <div class="bottom-back-to-index-container">
+        <a href="../index.html" class="back-to-index-btn">&larr; Back to Main Index</a>
+    </div>
+
+    <footer>
+        Shell & Scripting - Linux Manual
+    </footer>
+
+    <script>
+        const shellScriptingData = [
+            // Bash Reference
+            {
+                name: "Bash Special Variables",
+                description: "Commonly used special variables in Bash scripts.",
+                category: "bash-reference",
+                level: "intermediate",
+                examples: "$0: Name of the script.\n$1, $2, ... $9: Positional parameters (arguments to script).\n$#: Number of positional parameters.\n$*: All positional parameters as a single string.\n$@: All positional parameters as separate strings (use in double quotes: \"$@\").\n$?: Exit status of the last command.\n$$: Process ID (PID) of the current shell.\n$!: PID of the last background command.",
+                tags: ["bash", "scripting", "variables", "special variables", "shell"]
+            },
+            {
+                name: "Parameter Expansion",
+                description: "Manipulating variable content directly in Bash.",
+                category: "bash-reference",
+                level: "advanced",
+                examples: "${var:-word}: If var is unset or null, use 'word'.\n${var:=word}: If var is unset or null, set var to 'word' and use it.\n${var:?message}: If var is unset or null, print message to stderr and exit.\n${var#pattern}: Remove shortest match of pattern from beginning.\n${var##pattern}: Remove longest match of pattern from beginning.\n${var%pattern}: Remove shortest match of pattern from end.\n${var%%pattern}: Remove longest match of pattern from end.\n${var/pattern/string}: Replace first match.\n${var//pattern/string}: Replace all matches.",
+                tags: ["bash", "scripting", "parameter expansion", "variables", "manipulation"]
+            },
+            {
+                name: "Bash Conditional Expressions (Test Operators)",
+                description: "Comparing values and checking file attributes in Bash scripts.",
+                category: "bash-reference",
+                level: "intermediate",
+                examples: "Use [[ ... ]] for modern Bash, [ ... ] for POSIX compatibility, (( ... )) for arithmetic.\nString comparison:\n  [[ \"$str1\" == \"$str2\" ]]\n  [[ \"$str1\" != \"$str2\" ]]\n  [[ -z \"$str\" ]] # True if string is empty\n  [[ -n \"$str\" ]] # True if string is not empty\nNumeric comparison:\n  [[ \"$num1\" -eq \"$num2\" ]] # equal\n  [[ \"$num1\" -ne \"$num2\" ]] # not equal\n  [[ \"$num1\" -lt \"$num2\" ]] # less than (also -le, -gt, -ge)\nFile tests:\n  [[ -e \"/path/to/file\" ]] # exists\n  [[ -f \"/path/to/file\" ]] # is a regular file\n  [[ -d \"/path/to/dir\" ]] # is a directory\n  [[ -r \"/path/to/file\" ]] # is readable",
+                tags: ["bash", "scripting", "conditionals", "test", "if statement", "logic"]
+            },
+            {
+                name: "Bash Loops (for, while, until)",
+                description: "Iterating in Bash scripts.",
+                category: "bash-reference",
+                level: "basic",
+                examples: "For loop (list):\n  for i in 1 2 3; do echo $i; done\n  for file in *.txt; do echo \"Processing $file\"; done\nC-style for loop:\n  for (( c=1; c<=5; c++ )); do echo \"Welcome $c times\"; done\nWhile loop:\n  count=0; while [[ $count -lt 5 ]]; do echo $count; ((count++)); done\nUntil loop:\n  counter=0; until [[ $counter -ge 3 ]]; do echo $counter; ((counter++)); done",
+                tags: ["bash", "scripting", "loops", "for loop", "while loop", "iteration"]
+            },
+            {
+                name: "Bash Functions",
+                description: "Defining and using functions in Bash scripts.",
+                category: "bash-reference",
+                level: "intermediate",
+                examples: "greet() {\n  echo \"Hello, $1!\"\n}\ngreet \"World\" # Calls function, outputs \"Hello, World!\"\n\nmy_func() {\n  local var=\"I am local\"\n  return 0 # Exit status\n}\nif my_func; then echo \"Success\"; fi",
+                tags: ["bash", "scripting", "functions", "procedures", "modular"]
+            },
+            // Text Processing
+            {
+                name: "grep (patterns)",
+                description: "Search plain-text data sets for lines that match a regular expression. Advanced patterns.",
+                category: "text-processing",
+                level: "intermediate",
+                examples: "grep -E 'pattern1|pattern2' file.txt # Extended regex, OR condition\ngrep -i 'error' log.txt # Case-insensitive\ngrep -v 'debug' app.log # Invert match (lines not containing 'debug')\ngrep -r 'TODO' ./src # Recursive search\ngrep -o '[0-9]+' data.txt # Show only the matched part",
+                tags: ["grep", "regex", "text processing", "search", "filter", "pattern"]
+            },
+            {
+                name: "awk (patterns & actions)",
+                description: "Versatile programming language for working on files, line by line.",
+                category: "text-processing",
+                level: "advanced",
+                examples: "awk '{print $1, $3}' file.txt # Print 1st and 3rd fields\nawk -F':' '{print $1}' /etc/passwd # Use ':' as field separator\nawk '/error/ {print $0}' log.txt # Print lines containing 'error'\nawk 'NF > 5 {print \"Line\", NR, \"has\", NF, \"fields\"}' data.txt\nawk 'BEGIN {FS=\",\"} {sum+=$2} END {print sum}' values.csv",
+                tags: ["awk", "text processing", "scripting", "filter", "report", "columns"]
+            },
+            {
+                name: "sed (stream editor)",
+                description: "Perform basic text transformations on an input stream (a file or input from a pipeline).",
+                category: "text-processing",
+                level: "advanced",
+                examples: "sed 's/old/new/g' file.txt # Substitute all 'old' with 'new'\nsed -i 's/foo/bar/' file.txt # In-place edit (use with caution!)\nsed '/^#/d' config.txt # Delete lines starting with '#'\nsed '10q' largefile.txt # Print first 10 lines and quit\nsed -n '5,10p' file.txt # Print lines 5 to 10",
+                tags: ["sed", "text processing", "stream editor", "substitute", "replace", "delete lines"]
+            },
+            {
+                name: "cut, paste, join",
+                description: "Tools for manipulating columnar data.",
+                category: "text-processing",
+                level: "intermediate",
+                examples: "cut -d':' -f1,3 /etc/passwd # Cut fields 1 and 3 using ':' delimiter\ncut -c1-10 file.txt # Cut characters 1 through 10\npaste file1.txt file2.txt # Merge lines of files side-by-side\njoin file1.txt file2.txt # Join lines of two files on a common field (requires sorted input)",
+                tags: ["cut", "paste", "join", "text processing", "columns", "fields"]
+            },
+            {
+                name: "Regular Expression (Regex) Cheat Sheet",
+                description: "Common regex metacharacters and constructs used in tools like grep, sed, awk.",
+                category: "text-processing",
+                level: "intermediate",
+                examples: ".: Any single character (except newline)\n*: Zero or more of preceding\n+: One or more of preceding\n?: Zero or one of preceding\n^: Start of line\n$: End of line\n[abc]: Any one of a, b, or c\n[^abc]: Any char except a, b, or c\n[a-z]: Any lowercase letter\n\\d: Digit (in some regex flavors like Perl-compatible)\n\\s: Whitespace character\n\\w: Word character (alphanumeric + _)\n(pattern): Grouping\npattern1|pattern2: OR condition",
+                tags: ["regex", "regular expression", "pattern matching", "text processing", "cheat sheet"]
+            },
+            // CLI Tools
+            {
+                name: "find (with -exec and -printf)",
+                description: "Search for files in a directory hierarchy with advanced actions and formatting.",
+                category: "cli-tools",
+                level: "advanced",
+                examples: "find . -name \"*.log\" -exec rm {} \\; # Find .log files and remove them\nfind /var/log -type f -mtime +7 -delete # Delete files older than 7 days\nfind . -type f -perm 644 -print0 | xargs -0 chmod 755 # Change permissions\nfind . -name \"*.c\" -printf \"%h/%f\\t%s bytes\\t%TH:%TM\\n\" # Custom output format",
+                tags: ["find", "search", "files", "exec", "printf", "cli", "utility"]
+            },
+            {
+                name: "xargs",
+                description: "Build and execute command lines from standard input.",
+                category: "cli-tools",
+                level: "intermediate",
+                examples: "find . -name \"*.tmp\" | xargs rm -v\nls *.jpg | xargs -n1 -I{} convert {} {}.png # Process one by one\ncat urls.txt | xargs -P 4 wget # Parallel download (4 jobs)",
+                tags: ["xargs", "cli", "utility", "pipeline", "batch processing", "parallel"]
+            },
+            {
+                name: "tmux & screen (Terminal Multiplexers)",
+                description: "Allow multiple terminal sessions to be accessed from a single window, persist sessions after disconnect.",
+                category: "cli-tools",
+                level: "intermediate",
+                examples: "tmux new -s my_session # Start new tmux session\nCtrl+b, d: Detach from tmux session\ntmux attach -t my_session # Re-attach\nCtrl+b, c: New window\nCtrl+b, %: Split pane vertically\nCtrl+b, \": Split pane horizontally\n\nscreen # Start new screen session\nCtrl+a, d: Detach from screen\nscreen -r # Re-attach",
+                tags: ["tmux", "screen", "terminal multiplexer", "session management", "cli", "productivity"]
+            }
+        ];
+
+        const sectionItems = shellScriptingData; // This line is crucial
+
+        function getCategoryDisplayName(category) {
+            const categories = {
+                'bash-reference': 'Bash Reference',
+                'text-processing': 'Text Processing',
+                'cli-tools': 'CLI Tools'
+            };
+            return categories[category] || category.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        function renderItems(itemsToRender) {
+            const itemListElement = document.getElementById('content-list');
+            itemListElement.innerHTML = '';
+
+            if (itemsToRender.length === 0) {
+                itemListElement.innerHTML = `<div class="no-results"><h3>No entries found</h3><p>Try adjusting your search criteria.</p></div>`;
+                return;
+            }
+
+            itemsToRender.forEach(item => {
+                const itemCard = document.createElement('div');
+                itemCard.className = 'command-card';
+
+                const typeClass = item.level ? (item.level === 'basic' ? 'basic' : item.level === 'intermediate' ? 'intermediate' : 'advanced') : 'standard';
+
+                itemCard.innerHTML = `
+                    <div class="command-name">${item.name}</div>
+                    <div class="command-tags">
+                        ${item.category ? `<span class="category">${getCategoryDisplayName(item.category)}</span>` : ''}
+                        <span class="level ${typeClass}">${item.level || 'standard'}</span>
+                    </div>
+                    ${item.syntax ? `<div class="command-syntax">${item.syntax.replace(/\n/g, '<br>')}</div>` : ''}
+                    <div class="command-description">${item.description}</div>
+                    ${item.examples ? `<div class="command-example"><strong>Details/Examples:</strong><br>${item.examples.replace(/\n/g, '<br>')}</div>` : ''}
+                    ${item.manLink ? `<div class="learn-more"><a href="${item.manLink}" target="_blank">Learn More</a></div>` : ''}
+                `;
+                itemListElement.appendChild(itemCard);
+            });
+        }
+
+        function filterItems() {
+            const searchTerm = document.getElementById('search').value.toLowerCase();
+            const categoryFilter = document.getElementById('category-filter').value;
+
+            const filteredItems = sectionItems.filter(item => {
+                const searchMatch =
+                    item.name.toLowerCase().includes(searchTerm) ||
+                    item.description.toLowerCase().includes(searchTerm) ||
+                    (item.tags && item.tags.some(tag => tag.toLowerCase().includes(searchTerm))) ||
+                    (item.syntax && item.syntax.toLowerCase().includes(searchTerm)) ||
+                    (item.examples && item.examples.toLowerCase().includes(searchTerm));
+
+                const categoryMatch = categoryFilter === 'all' || item.category === categoryFilter;
+
+                return searchMatch && categoryMatch;
+            });
+
+            renderItems(filteredItems);
+        }
+
+        document.getElementById('search').addEventListener('input', filterItems);
+        document.getElementById('category-filter').addEventListener('change', filterItems);
+        document.getElementById('reset').addEventListener('click', () => {
+            document.getElementById('search').value = '';
+            document.getElementById('category-filter').value = 'all';
+            renderItems(sectionItems);
+        });
+
+        renderItems(sectionItems); // Initial render
+    </script>
+</body>
+</html>

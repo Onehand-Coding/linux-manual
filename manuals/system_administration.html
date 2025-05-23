@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux Manual - System Administration</title>
+    <link rel="stylesheet" href="css/styles.css"/>
+</head>
+<body>
+    <h1>Linux Manual - System Administration</h1>
+
+    <div class="search-container">
+        <input type="text" id="search" placeholder="Search admin topics...">
+        <select id="category-filter">
+            <option value="all">All Categories</option>
+            <option value="user-management">User & Group Management</option>
+            <option value="disk-management">Disk & Filesystem</option>
+            </select>
+        <button id="reset">Reset</button>
+    </div>
+
+    <div class="command-list" id="content-list">
+        </div>
+
+    <div class="bottom-back-to-index-container">
+        <a href="../index.html" class="back-to-index-btn">&larr; Back to Main Index</a>
+    </div>
+
+    <footer>
+        System Administration - Linux Manual
+    </footer>
+
+    <script>
+        const systemAdminData = [
+            // User & Group Management
+            {
+                name: "useradd [options] [username]",
+                syntax: "useradd -m -s /bin/bash newuser",
+                description: "Creates a new user account.",
+                examples: "sudo useradd -m -g users -s /usr/sbin/nologin restricteduser\nsudo useradd -c \"Service Account\" -r service_acc",
+                level: "basic",
+                category: "user-management",
+                tags: ["user", "group", "add", "account", "create"]
+            },
+            {
+                name: "usermod [options] [username]",
+                syntax: "usermod -aG sudo existinguser",
+                description: "Modifies an existing user account.",
+                examples: "sudo usermod -s /bin/zsh john\nsudo usermod -L jane # Lock account\nsudo usermod -U jane # Unlock account\nsudo usermod -G newgroup,anothergroup user --append", // Corrected from just --append to indicate adding to groups
+                level: "intermediate",
+                category: "user-management",
+                tags: ["user", "group", "modify", "account", "update"]
+            },
+            {
+                name: "passwd [username]",
+                syntax: "passwd newuser",
+                description: "Changes the password for a user. If no username is given, changes password for the current user.",
+                examples: "sudo passwd root\npasswd\nsudo passwd -l restricteduser # Lock password\nsudo passwd -u restricteduser # Unlock password",
+                level: "basic",
+                category: "user-management",
+                tags: ["user", "password", "security", "credentials"]
+            },
+            {
+                name: "userdel [options] [username]",
+                syntax: "userdel -r olduser",
+                description: "Deletes a user account.",
+                examples: "sudo userdel someuser\nsudo userdel -r someuser # Remove home directory and mail spool",
+                level: "intermediate",
+                category: "user-management",
+                tags: ["user", "delete", "remove", "account"]
+            },
+            {
+                name: "groupadd [options] [groupname]",
+                syntax: "groupadd newgroup",
+                description: "Creates a new group.",
+                examples: "sudo groupadd developers\nsudo groupadd -r systemgroup",
+                level: "basic",
+                category: "user-management",
+                tags: ["group", "add", "create"]
+            },
+            {
+                name: "groupmod [options] [groupname]",
+                syntax: "groupmod -n new_group_name old_group_name",
+                description: "Modifies an existing group.",
+                examples: "sudo groupmod -g 1005 developers # Change GID\nsudo groupmod -n webdevs developers # Rename group",
+                level: "intermediate",
+                category: "user-management",
+                tags: ["group", "modify", "update"]
+            },
+            {
+                name: "groupdel [groupname]",
+                syntax: "groupdel oldgroup",
+                description: "Deletes a group.",
+                examples: "sudo groupdel temporary_group",
+                level: "intermediate",
+                category: "user-management",
+                tags: ["group", "delete", "remove"]
+            },
+            {
+                name: "Sudoers File Syntax & visudo",
+                description: "Overview of /etc/sudoers syntax and the importance of using 'visudo' to edit it.",
+                category: "user-management",
+                level: "advanced",
+                examples: "Always use 'sudo visudo' to edit /etc/sudoers.\nUser Privilege Specification:\n  root    ALL=(ALL:ALL) ALL\n  %admin  ALL=(ALL) ALL\n  jsmith  ALL=(ALL) NOPASSWD: /usr/bin/apt update\n\nUser_Alias ADMINS = user1, user2\nCmnd_Alias SOFTWARE = /usr/bin/apt, /usr/bin/yum\nADMINS ALL = SOFTWARE",
+                tags: ["sudo", "sudoers", "permissions", "security", "privileges", "visudo"]
+            },
+            {
+                name: "PAM (Pluggable Authentication Modules)",
+                description: "Brief overview of PAM and its role in authentication and session management. Configuration is typically in /etc/pam.d/.",
+                category: "user-management",
+                level: "advanced",
+                examples: "PAM allows system administrators to set authentication policies without recompiling applications.\nKey files: /etc/pam.conf, /etc/pam.d/*\nCommon modules: pam_unix (traditional password auth), pam_tally2 (login attempt counting), pam_cracklib (password strength).",
+                tags: ["pam", "authentication", "security", "login", "modules"]
+            },
+            // Disk & Filesystem
+            {
+                name: "fdisk [device]",
+                syntax: "fdisk /dev/sda",
+                description: "Menu-driven program for creating and manipulating partition tables (MBR and GPT).",
+                examples: "sudo fdisk -l # List partitions (can also use without device)\nsudo fdisk /dev/sdb # Start interactive mode for /dev/sdb\nCommon commands within fdisk: n (new), d (delete), p (print), w (write), q (quit)",
+                level: "intermediate",
+                category: "disk-management",
+                tags: ["disk", "partition", "fdisk", "storage", "mbr", "gpt"]
+            },
+            {
+                name: "parted [device]",
+                syntax: "parted /dev/sda",
+                description: "GNU utility for manipulating disk partitions; supports GPT and MBR, can be used interactively or scripted.",
+                examples: "sudo parted /dev/sdb print # Show partition table\nsudo parted /dev/sdb mklabel gpt # Create a new GPT label\nsudo parted /dev/sdb mkpart primary ext4 0% 100% # Create a partition",
+                level: "advanced",
+                category: "disk-management",
+                tags: ["disk", "partition", "parted", "storage", "gpt", "mbr"]
+            },
+            {
+                name: "lsblk [options]",
+                syntax: "lsblk",
+                description: "Lists block devices (disks, partitions, LVMs, etc.) in a tree-like format.",
+                examples: "lsblk\nlsblk -f # Show filesystem info\nlsblk -m # Show permissions and owner\nlsblk -o NAME,FSTYPE,SIZE,MOUNTPOINT",
+                level: "basic",
+                category: "disk-management",
+                tags: ["disk", "partition", "lsblk", "block device", "storage", "filesystem"]
+            },
+            {
+                name: "Filesystem Types Overview",
+                description: "Common Linux filesystem types and their primary characteristics.",
+                category: "disk-management",
+                level: "intermediate",
+                examples: "ext4: Journaling, widely used, stable, good all-rounder.\nXFS: High-performance for large files and filesystems, good for servers.\nBtrfs: Modern, Copy-on-Write (CoW), snapshots, built-in RAID, checksums.\nZFS (on Linux): Advanced, CoW, snapshots, data integrity, RAID-Z (requires separate installation).\nVFAT/FAT32: For compatibility with Windows/macOS on external drives (no permissions, size limits).\nexFAT: Like FAT32 but supports larger files/partitions, good for external drives.",
+                tags: ["filesystem", "ext4", "xfs", "btrfs", "zfs", "fat32", "exfat", "types"]
+            },
+            {
+                name: "LVM (Logical Volume Management) Cheat Sheet",
+                description: "Key commands for managing LVM storage.",
+                category: "disk-management",
+                level: "advanced",
+                examples: "Initialize Physical Volume (PV):\n  pvcreate /dev/sdb1 /dev/sdc1\n  pvdisplay\nCreate Volume Group (VG):\n  vgcreate my_volume_group /dev/sdb1 /dev/sdc1\n  vgdisplay my_volume_group\nCreate Logical Volume (LV):\n  lvcreate -L 50G -n my_logical_volume my_volume_group\n  lvcreate -l 100%FREE -n another_lv my_volume_group # Use all remaining space\n  lvdisplay\nFormat and Mount LV:\n  mkfs.ext4 /dev/my_volume_group/my_logical_volume\n  mount /dev/my_volume_group/my_logical_volume /mnt/mydata\nExtend LV:\n  lvextend -L +10G /dev/my_volume_group/my_logical_volume\n  resize2fs /dev/my_volume_group/my_logical_volume # For ext2/3/4",
+                tags: ["lvm", "disk", "volume", "logical volume manager", "storage", "pvcreate", "vgcreate", "lvcreate"]
+            },
+            {
+                name: "mount [options] [device] [directory]",
+                syntax: "mount /dev/sdb1 /mnt/mydata",
+                description: "Mounts a filesystem. /etc/fstab is used for persistent mounts.",
+                examples: "sudo mount /dev/sdb1 /mnt/data\nsudo mount -t ntfs-3g /dev/sdc1 /mnt/windows\nsudo mount -o remount,rw / # Remount root read-write\ndf -h # Check mounted filesystems",
+                level: "basic",
+                category: "disk-management",
+                tags: ["mount", "filesystem", "storage", "fstab"]
+            },
+            {
+                name: "umount [directory|device]",
+                syntax: "umount /mnt/mydata",
+                description: "Unmounts a filesystem.",
+                examples: "sudo umount /mnt/data\nsudo umount /dev/sdb1",
+                level: "basic",
+                category: "disk-management",
+                tags: ["umount", "unmount", "filesystem", "storage"]
+            },
+            {
+                name: "/etc/fstab File Structure",
+                description: "Configuration file that defines how disk partitions, various other block devices, or remote filesystems are mounted into the filesystem.",
+                category: "disk-management",
+                level: "intermediate",
+                examples: "Structure: <device> <mount_point> <filesystem_type> <options> <dump> <pass>\nExample entry:\n  UUID=xxxx-xxxx /home ext4 defaults,errors=remount-ro 0 2\n  /dev/sdb1 /mnt/backup xfs nodev,nosuid 0 0\n  //server/share /mnt/cifs cifs credentials=/root/.smbcreds,uid=1000 0 0",
+                tags: ["fstab", "mount", "persistent", "boot", "filesystem", "configuration"]
+            }
+            // You can add your Systemd Service Management data here if you wish to combine them
+        ];
+
+        const sectionItems = systemAdminData; // This line is crucial
+
+        function getCategoryDisplayName(category) {
+            const categories = {
+                'service-management': 'Service Management', // If you add Systemd data
+                'user-management': 'User Management',
+                'disk-management': 'Disk Management'
+            };
+            return categories[category] || category.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        function renderItems(itemsToRender) {
+            const itemListElement = document.getElementById('content-list');
+            itemListElement.innerHTML = '';
+
+            if (itemsToRender.length === 0) {
+                itemListElement.innerHTML = `<div class="no-results"><h3>No entries found</h3><p>Try adjusting your search criteria.</p></div>`;
+                return;
+            }
+
+            itemsToRender.forEach(item => {
+                const itemCard = document.createElement('div');
+                itemCard.className = 'command-card';
+
+                const typeClass = item.level ? (item.level === 'basic' ? 'basic' : item.level === 'intermediate' ? 'intermediate' : 'advanced') : 'standard';
+
+                itemCard.innerHTML = `
+                    <div class="command-name">${item.name}</div>
+                    <div class="command-tags">
+                        ${item.category ? `<span class="category">${getCategoryDisplayName(item.category)}</span>` : ''}
+                        <span class="level ${typeClass}">${item.level || 'standard'}</span>
+                    </div>
+                    ${item.syntax ? `<div class="command-syntax">${item.syntax.replace(/\n/g, '<br>')}</div>` : ''}
+                    <div class="command-description">${item.description}</div>
+                    ${item.examples ? `<div class="command-example"><strong>Details/Examples:</strong><br>${item.examples.replace(/\n/g, '<br>')}</div>` : ''}
+                    ${item.manLink ? `<div class="learn-more"><a href="${item.manLink}" target="_blank">Learn More</a></div>` : ''}
+                `;
+                itemListElement.appendChild(itemCard);
+            });
+        }
+
+        function filterItems() {
+            const searchTerm = document.getElementById('search').value.toLowerCase();
+            const categoryFilter = document.getElementById('category-filter').value;
+
+            const filteredItems = sectionItems.filter(item => {
+                const searchMatch =
+                    item.name.toLowerCase().includes(searchTerm) ||
+                    item.description.toLowerCase().includes(searchTerm) ||
+                    (item.tags && item.tags.some(tag => tag.toLowerCase().includes(searchTerm))) ||
+                    (item.syntax && item.syntax.toLowerCase().includes(searchTerm)) ||
+                    (item.examples && item.examples.toLowerCase().includes(searchTerm));
+
+                const categoryMatch = categoryFilter === 'all' || item.category === categoryFilter;
+
+                return searchMatch && categoryMatch;
+            });
+
+            renderItems(filteredItems);
+        }
+
+        document.getElementById('search').addEventListener('input', filterItems);
+        document.getElementById('category-filter').addEventListener('change', filterItems);
+        document.getElementById('reset').addEventListener('click', () => {
+            document.getElementById('search').value = '';
+            document.getElementById('category-filter').value = 'all';
+            renderItems(sectionItems);
+        });
+
+        renderItems(sectionItems); // Initial render
+    </script>
+</body>
+</html>

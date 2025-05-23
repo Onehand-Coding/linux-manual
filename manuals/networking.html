@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux Manual - Networking</title>
+    <link rel="stylesheet" href="css/styles.css"/>
+    </head>
+<body>
+    <h1>Linux Manual - Networking</h1>
+    <div class="search-container">
+        <input type="text" id="search" placeholder="Search networking topics...">
+        <select id="category-filter">
+            <option value="all">All Categories</option>
+            <option value="basic-networking">Basic Networking</option>
+            <option value="firewalls">Firewalls</option>
+            <option value="troubleshooting">Troubleshooting</option>
+        </select>
+        <button id="reset">Reset</button>
+    </div>
+
+    <div class="command-list" id="content-list"></div>
+
+    <div class="bottom-back-to-index-container">
+        <a href="../index.html" class="back-to-index-btn">&larr; Back to Main Index</a>
+    </div>
+
+    <footer>
+        Networking - Linux Manual
+    </footer>
+
+    <script>
+        const networkingData = [
+            // Basic Networking
+            {
+                name: "ip addr show",
+                syntax: "ip addr show [interface]",
+                description: "Displays IP addresses and network interface information.",
+                examples: "ip addr show\nip addr show eth0",
+                level: "basic",
+                category: "basic-networking",
+                tags: ["ip", "address", "interface", "network"]
+            },
+            {
+                name: "ifconfig (legacy)",
+                syntax: "ifconfig [interface]",
+                description: "Configure network interface parameters (legacy, use 'ip' command where possible).",
+                examples: "ifconfig\nifconfig eth0",
+                level: "basic",
+                category: "basic-networking",
+                tags: ["ifconfig", "address", "interface", "network", "legacy"]
+            },
+            {
+                name: "nmcli dev status",
+                syntax: "nmcli dev status",
+                description: "Shows status of network devices managed by NetworkManager.",
+                examples: "nmcli dev status\nnmcli con show --active",
+                level: "intermediate",
+                category: "basic-networking",
+                tags: ["nmcli", "networkmanager", "device", "status"]
+            },
+            {
+                name: "ss -tuln",
+                syntax: "ss -tuln",
+                description: "Displays listening TCP and UDP sockets (modern replacement for netstat).",
+                examples: "ss -tulnp # Show process names\nss -tan # Show all TCP sockets",
+                level: "intermediate",
+                category: "basic-networking",
+                tags: ["ss", "sockets", "ports", "listening", "network"]
+            },
+            {
+                name: "ip route show",
+                syntax: "ip route show",
+                description: "Displays the kernel routing table.",
+                examples: "ip route\nip route get 8.8.8.8 # Show route to a specific IP",
+                level: "intermediate",
+                category: "basic-networking",
+                tags: ["ip", "route", "routing table", "gateway", "network"]
+            },
+            {
+                name: "/etc/network/interfaces (Debian/Ubuntu legacy)",
+                description: "Static network configuration file for Debian-based systems (less common with NetworkManager or netplan).",
+                category: "basic-networking",
+                level: "intermediate",
+                examples: "Example entry for static IP:\nauto eth0\niface eth0 inet static\n  address 192.168.1.100\n  netmask 255.255.255.0\n  gateway 192.168.1.1\n  dns-nameservers 8.8.8.8 8.8.4.4",
+                tags: ["network configuration", "static ip", "interfaces", "debian", "ubuntu", "legacy"]
+            },
+            // Firewalls
+            {
+                name: "iptables -L -v -n",
+                syntax: "iptables -L [CHAIN] -v -n",
+                description: "Lists all rules in all chains or a specific chain (verbose, numeric output).",
+                examples: "sudo iptables -L INPUT -v -n --line-numbers\nsudo iptables -S # List rules in save format",
+                level: "advanced",
+                category: "firewalls",
+                tags: ["iptables", "firewall", "rules", "list", "security", "netfilter"]
+            },
+            {
+                name: "nft list ruleset",
+                syntax: "nft list ruleset",
+                description: "Displays the current nftables ruleset (modern replacement for iptables).",
+                examples: "sudo nft list tables\nsudo nft list chain inet filter input",
+                level: "advanced",
+                category: "firewalls",
+                tags: ["nftables", "nft", "firewall", "rules", "list", "security"]
+            },
+            {
+                name: "ufw status",
+                syntax: "ufw status [numbered|verbose]",
+                description: "Shows the status of UFW (Uncomplicated Firewall), a frontend for iptables/nftables.",
+                examples: "sudo ufw status\nsudo ufw status numbered\nsudo ufw enable\nsudo ufw allow 22/tcp # Allow SSH",
+                level: "basic",
+                category: "firewalls",
+                tags: ["ufw", "firewall", "status", "security", "uncomplicated firewall"]
+            },
+            {
+                name: "firewalld (firewall-cmd)",
+                description: "Zone-based firewall management tool, common on RHEL-based systems.",
+                category: "firewalls",
+                level: "intermediate",
+                examples: "sudo firewall-cmd --state\nsudo firewall-cmd --get-active-zones\nsudo firewall-cmd --permanent --add-service=http\nsudo firewall-cmd --reload",
+                tags: ["firewalld", "firewall-cmd", "firewall", "zones", "security", "rhel", "centos"]
+            },
+            // Troubleshooting
+            {
+                name: "ping [host]",
+                syntax: "ping [options] <hostname_or_IP>",
+                description: "Sends ICMP ECHO_REQUEST packets to network hosts to test connectivity.",
+                examples: "ping google.com\nping -c 4 8.8.8.8 # Send 4 packets\nping -s 1024 example.com # Set packet size",
+                level: "basic",
+                category: "troubleshooting",
+                tags: ["ping", "network", "connectivity", "icmp", "debug", "test"]
+            },
+            {
+                name: "traceroute [host] / mtr [host]",
+                syntax: "traceroute example.com",
+                description: "Prints the route packets trace to network host. `mtr` combines ping and traceroute.",
+                examples: "traceroute google.com\nsudo mtr google.com # mtr provides real-time updates",
+                level: "intermediate",
+                category: "troubleshooting",
+                tags: ["traceroute", "tracepath", "mtr", "network", "route", "hops", "debug"]
+            },
+            {
+                name: "dig [host] / nslookup [host]",
+                syntax: "dig example.com A",
+                description: "DNS lookup utilities. `dig` is more versatile.",
+                examples: "dig google.com MX\ndig @8.8.8.8 example.com AAAA\nnslookup example.com",
+                level: "intermediate",
+                category: "troubleshooting",
+                tags: ["dig", "nslookup", "dns", "lookup", "network", "resolve", "debug"]
+            },
+            {
+                name: "tcpdump",
+                syntax: "tcpdump [options] [expression]",
+                description: "Powerful command-line packet analyzer.",
+                examples: "sudo tcpdump -i eth0\nsudo tcpdump -i any port 80\nsudo tcpdump -i eth0 -w capture.pcap host 192.168.1.100 and port 443",
+                level: "advanced",
+                category: "troubleshooting",
+                tags: ["tcpdump", "packet capture", "sniffer", "network analysis", "debug", "wireshark"]
+            },
+            {
+                name: "netstat (legacy) / ss",
+                description: "Display network connections, routing tables, interface statistics. `ss` is the modern replacement for `netstat`.",
+                category: "troubleshooting",
+                level: "intermediate",
+                examples: "ss -tulnp # Show listening TCP/UDP sockets and processes\nss -tan # Show all TCP sockets\nss -s # Show summary statistics\n\nLegacy netstat examples:\n  netstat -tulnp\n  netstat -rn # Routing table",
+                tags: ["netstat", "ss", "network connections", "ports", "sockets", "routing", "stats"]
+            }
+        ]; // End of networkingData
+
+        const sectionItems = networkingData;
+
+        function getCategoryDisplayName(category) {
+            const categories = {
+                'basic-networking': 'Basic Networking',
+                'firewalls': 'Firewalls',
+                'troubleshooting': 'Troubleshooting'
+            };
+            return categories[category] || category.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        function renderItems(itemsToRender) {
+            const itemListElement = document.getElementById('content-list');
+            itemListElement.innerHTML = '';
+
+            if (itemsToRender.length === 0) {
+                itemListElement.innerHTML = `<div class="no-results"><h3>No entries found</h3><p>Try adjusting your search criteria.</p></div>`;
+                return;
+            }
+
+            itemsToRender.forEach(item => {
+                const itemCard = document.createElement('div');
+                itemCard.className = 'command-card';
+
+                const typeClass = item.level ? (item.level === 'basic' ? 'basic' : item.level === 'intermediate' ? 'intermediate' : 'advanced') : 'standard';
+
+                itemCard.innerHTML = `
+                    <div class="command-name">${item.name}</div>
+                    <div class="command-tags">
+                        ${item.category ? `<span class="category">${getCategoryDisplayName(item.category)}</span>` : ''}
+                        <span class="level ${typeClass}">${item.level || 'standard'}</span>
+                    </div>
+                    ${item.syntax ? `<div class="command-syntax">${item.syntax.replace(/\n/g, '<br>')}</div>` : ''}
+                    <div class="command-description">${item.description}</div>
+                    ${item.examples ? `<div class="command-example"><strong>Details/Examples:</strong><br>${item.examples.replace(/\n/g, '<br>')}</div>` : ''}
+                    ${item.manLink ? `<div class="learn-more"><a href="${item.manLink}" target="_blank">Learn More</a></div>` : ''}
+                `;
+                itemListElement.appendChild(itemCard);
+            });
+        }
+
+        function filterItems() {
+            const searchTerm = document.getElementById('search').value.toLowerCase();
+            const categoryFilter = document.getElementById('category-filter').value;
+
+            const filteredItems = sectionItems.filter(item => {
+                const searchMatch =
+                    item.name.toLowerCase().includes(searchTerm) ||
+                    item.description.toLowerCase().includes(searchTerm) ||
+                    (item.tags && item.tags.some(tag => tag.toLowerCase().includes(searchTerm))) ||
+                    (item.syntax && item.syntax.toLowerCase().includes(searchTerm)) ||
+                    (item.examples && item.examples.toLowerCase().includes(searchTerm));
+
+                const categoryMatch = categoryFilter === 'all' || item.category === categoryFilter;
+
+                return searchMatch && categoryMatch;
+            });
+
+            renderItems(filteredItems);
+        }
+
+        document.getElementById('search').addEventListener('input', filterItems);
+        document.getElementById('category-filter').addEventListener('change', filterItems);
+        document.getElementById('reset').addEventListener('click', () => {
+            document.getElementById('search').value = '';
+            document.getElementById('category-filter').value = 'all';
+            renderItems(sectionItems);
+        });
+
+        renderItems(sectionItems); // Initial render
+    </script>
+</body>
+</html>

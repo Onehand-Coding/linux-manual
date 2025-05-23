@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux Manual - Cloud & DevOps</title>
+    <link rel="stylesheet" href="css/styles.css"/>
+</head>
+<body>
+    <h1>Linux Manual - Cloud & DevOps</h1>
+
+    <div class="search-container">
+        <input type="text" id="search" placeholder="Search Cloud & DevOps topics...">
+        <select id="category-filter">
+            <option value="all">All Categories</option>
+            <option value="aws-cli">AWS CLI</option>
+            <option value="terraform">Terraform</option>
+            <option value="ci-cd">CI/CD</option>
+            </select>
+        <button id="reset">Reset</button>
+    </div>
+
+    <div class="command-list" id="content-list"></div>
+
+    <div class="bottom-back-to-index-container">
+        <a href="../index.html" class="back-to-index-btn">&larr; Back to Main Index</a>
+    </div>
+
+    <footer>
+        Cloud & DevOps - Linux Manual
+    </footer>
+
+    <script>
+        const cloudDevopsData = [
+            // AWS CLI
+            {
+                name: "AWS CLI EC2 Common Commands",
+                description: "Frequently used AWS CLI commands for managing EC2 instances.",
+                category: "aws-cli",
+                level: "intermediate",
+                examples: "aws ec2 describe-instances\naws ec2 run-instances --image-id ami-xxxxxxxx --count 1 --instance-type t2.micro --key-name MyKeyPair\naws ec2 start-instances --instance-ids i-xxxxxxxxxxxxxxxxx\naws ec2 stop-instances --instance-ids i-xxxxxxxxxxxxxxxxx\naws ec2 terminate-instances --instance-ids i-xxxxxxxxxxxxxxxxx",
+                tags: ["aws", "aws-cli", "ec2", "cloud", "devops", "virtual machine"]
+            },
+            {
+                name: "AWS CLI S3 Common Commands",
+                description: "Frequently used AWS CLI commands for managing S3 buckets and objects.",
+                category: "aws-cli",
+                level: "intermediate",
+                examples: "aws s3 ls # List buckets\naws s3 ls s3://mybucket\naws s3 cp localfile.txt s3://mybucket/remote_location/\naws s3 sync ./local_dir s3://mybucket/sync_dir\naws s3 rm s3://mybucket/object.txt",
+                tags: ["aws", "aws-cli", "s3", "cloud", "storage", "devops"]
+            },
+            {
+                name: "AWS CLI IAM Basic Commands",
+                description: "Basic AWS CLI commands for listing IAM users and roles.",
+                category: "aws-cli",
+                level: "intermediate",
+                examples: "aws iam list-users\naws iam list-roles\naws iam get-user --user-name MyUser\naws sts get-caller-identity # Check current IAM identity",
+                tags: ["aws", "aws-cli", "iam", "security", "cloud", "identity", "devops"]
+            },
+            // Terraform
+            {
+                name: "Terraform Common Commands",
+                description: "Core Terraform CLI commands for managing infrastructure as code.",
+                category: "terraform",
+                level: "intermediate",
+                examples: "terraform init # Initialize a working directory\nterraform validate # Validate configuration files\nterraform plan # Create an execution plan\nterraform apply # Apply the changes required to reach the desired state\nterraform destroy # Destroy Terraform-managed infrastructure\nterraform fmt # Rewrite configuration files to a canonical format",
+                tags: ["terraform", "iac", "infrastructure as code", "devops", "cloud", "automation"]
+            },
+            {
+                name: "Terraform HCL Syntax Examples (Basic)",
+                description: "Basic structure of HashiCorp Configuration Language (HCL) used by Terraform.",
+                category: "terraform",
+                level: "intermediate",
+                examples: "Provider block:\n  provider \"aws\" {\n    region = \"us-west-2\"\n  }\nResource block:\n  resource \"aws_instance\" \"example\" {\n    ami           = \"ami-0c55b31ad22f6b050\"\n    instance_type = \"t2.micro\"\n    tags = {\n      Name = \"TerraformExample\"\n    }\n  }\nVariable block:\n  variable \"instance_type\" {\n    description = \"EC2 instance type\"\n    type        = string\n    default     = \"t2.nano\"\n  }\nOutput block:\n  output \"instance_ip\" {\n    value = aws_instance.example.public_ip\n  }",
+                tags: ["terraform", "hcl", "syntax", "iac", "devops", "configuration"]
+            },
+            // CI/CD
+            {
+                name: "GitHub Actions YAML Reference (Basic Workflow)",
+                description: "Basic structure of a GitHub Actions workflow YAML file.",
+                category: "ci-cd",
+                level: "intermediate",
+                examples: "name: CI Pipeline\non: [push, pull_request]\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n      - name: Checkout code\n        uses: actions/checkout@v3\n      - name: Set up Node.js\n        uses: actions/setup-node@v3\n        with:\n          node-version: '18'\n      - name: Install dependencies\n        run: npm install\n      - name: Run tests\n        run: npm test",
+                tags: ["github actions", "ci-cd", "yaml", "devops", "automation", "workflow"]
+            },
+            {
+                name: "GitLab CI .gitlab-ci.yml Examples (Basic)",
+                description: "Basic structure and job definition in a .gitlab-ci.yml file.",
+                category: "ci-cd",
+                level: "intermediate",
+                examples: "stages:\n  - build\n  - test\n  - deploy\n\nbuild_job:\n  stage: build\n  script:\n    - echo \"Building the project...\"\n    - npm install\n  artifacts:\n    paths:\n      - node_modules/\n\ntest_job:\n  stage: test\n  script:\n    - echo \"Running tests...\"\n    - npm test",
+                tags: ["gitlab ci", "ci-cd", "yaml", "devops", "automation", ".gitlab-ci.yml"]
+            }
+        ];
+
+        const sectionItems = cloudDevopsData; // This line is crucial
+
+        function getCategoryDisplayName(category) {
+            const categories = {
+                'aws-cli': 'AWS CLI',
+                'terraform': 'Terraform',
+                'ci-cd': 'CI/CD'
+            };
+            return categories[category] || category.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        function renderItems(itemsToRender) {
+            const itemListElement = document.getElementById('content-list');
+            itemListElement.innerHTML = '';
+
+            if (itemsToRender.length === 0) {
+                itemListElement.innerHTML = `<div class="no-results"><h3>No entries found</h3><p>Try adjusting your search criteria.</p></div>`;
+                return;
+            }
+
+            itemsToRender.forEach(item => {
+                const itemCard = document.createElement('div');
+                itemCard.className = 'command-card';
+
+                const typeClass = item.level ? (item.level === 'basic' ? 'basic' : item.level === 'intermediate' ? 'intermediate' : 'advanced') : 'standard';
+
+                itemCard.innerHTML = `
+                    <div class="command-name">${item.name}</div>
+                    <div class="command-tags">
+                        ${item.category ? `<span class="category">${getCategoryDisplayName(item.category)}</span>` : ''}
+                        <span class="level ${typeClass}">${item.level || 'standard'}</span>
+                    </div>
+                    ${item.syntax ? `<div class="command-syntax">${item.syntax.replace(/\n/g, '<br>')}</div>` : ''}
+                    <div class="command-description">${item.description}</div>
+                    ${item.examples ? `<div class="command-example"><strong>Details/Examples:</strong><br>${item.examples.replace(/\n/g, '<br>')}</div>` : ''}
+                    ${item.manLink ? `<div class="learn-more"><a href="${item.manLink}" target="_blank">Learn More</a></div>` : ''}
+                `;
+                itemListElement.appendChild(itemCard);
+            });
+        }
+
+        function filterItems() {
+            const searchTerm = document.getElementById('search').value.toLowerCase();
+            const categoryFilter = document.getElementById('category-filter').value;
+
+            const filteredItems = sectionItems.filter(item => {
+                const searchMatch =
+                    item.name.toLowerCase().includes(searchTerm) ||
+                    item.description.toLowerCase().includes(searchTerm) ||
+                    (item.tags && item.tags.some(tag => tag.toLowerCase().includes(searchTerm))) ||
+                    (item.syntax && item.syntax.toLowerCase().includes(searchTerm)) ||
+                    (item.examples && item.examples.toLowerCase().includes(searchTerm));
+
+                const categoryMatch = categoryFilter === 'all' || item.category === categoryFilter;
+
+                return searchMatch && categoryMatch;
+            });
+
+            renderItems(filteredItems);
+        }
+
+        document.getElementById('search').addEventListener('input', filterItems);
+        document.getElementById('category-filter').addEventListener('change', filterItems);
+        document.getElementById('reset').addEventListener('click', () => {
+            document.getElementById('search').value = '';
+            document.getElementById('category-filter').value = 'all';
+            renderItems(sectionItems);
+        });
+
+        renderItems(sectionItems); // Initial render
+    </script>
+</body>
+</html>

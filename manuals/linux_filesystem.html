@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filesystem</title>
+    <link  rel="stylesheet" href="css/styles.css"/>
+</head>
+<body>
+    <h1>Linux Filesystem</h1>
+    
+    <div class="search-container">
+        <input type="text" id="search" placeholder="Search directories or files...">
+        <select id="importance-filter">
+            <option value="all">All Importance</option>
+            <option value="critical">Critical</option>
+            <option value="important">Important</option>
+            <option value="standard">Standard</option>
+        </select>
+        <button id="reset">Reset</button>
+    </div>
+    
+    <h2>Filesystem Hierarchy</h2>
+    <div class="filesystem-grid" id="filesystem-grid">
+        <!-- Directories will be populated here by JavaScript -->
+    </div>
+
+    <h2>Important Configuration Files</h2>
+    <div class="config-files">
+        <table class="config-table">
+            <thead>
+                <tr>
+                    <th>File</th>
+                    <th>Location</th>
+                    <th>Purpose</th>
+                </tr>
+            </thead>
+            <tbody id="config-files-list">
+                <!-- Config files will be populated here by JavaScript -->
+            </tbody>
+        </table>
+    </div>
+    
+    <h2>Special Filesystem Locations</h2>
+    <div class="filesystem-grid" id="special-grid">
+        <!-- Special locations will be populated here by JavaScript -->
+    </div>
+
+    <div class="bottom-back-to-index-container">
+        <a href="../index.html" class="back-to-index-btn">&larr; Back to Main Index</a>
+    </div>
+
+    <footer>
+        Filesystem - Linux Manual
+    </footer>
+
+    <script>
+        // Define Linux filesystem database
+        const linuxFilesystem = [
+            // ROOT DIRECTORY
+            {
+                name: "Root",
+                path: "/",
+                description: "The root directory, starting point of the filesystem hierarchy.",
+                importance: "critical",
+                contents: [
+                    "All other directories branch from here",
+                    "Should only contain other directories, no regular files"
+                ]
+            },
+            
+            // BINARIES
+            {
+                name: "bin",
+                path: "/bin",
+                description: "Essential command binaries for all users.",
+                importance: "critical",
+                contents: [
+                    "Common commands like <code>ls</code>, <code>cp</code>, <code>mv</code>",
+                    "Needed in single-user mode",
+                    "Typically static binaries"
+                ]
+            },
+            {
+                name: "sbin",
+                path: "/sbin",
+                description: "Essential system binaries for system administration.",
+                importance: "critical",
+                contents: [
+                    "System management commands like <code>fdisk</code>, <code>ifconfig</code>",
+                    "Typically requires root privileges",
+                    "Needed before /usr is mounted"
+                ]
+            },
+            {
+                name: "usr/bin",
+                path: "/usr/bin",
+                description: "Non-essential command binaries for all users.",
+                importance: "standard",
+                contents: [
+                    "Most user commands",
+                    "Applications installed from distribution packages",
+                    "May be on a separate partition"
+                ]
+            },
+            {
+                name: "usr/sbin",
+                path: "/usr/sbin",
+                description: "Non-essential system binaries for administration.",
+                importance: "standard",
+                contents: [
+                    "Non-critical system administration commands",
+                    "Network daemons and other system programs"
+                ]
+            },
+            {
+                name: "usr/local/bin",
+                path: "/usr/local/bin",
+                description: "Local binaries specific to this system.",
+                importance: "important",
+                contents: [
+                    "Programs compiled/installed locally",
+                    "Not managed by the distribution's package manager",
+                    "Takes precedence over /usr/bin in PATH"
+                ]
+            },
+            
+            // CONFIGURATION
+            {
+                name: "etc",
+                path: "/etc",
+                description: "Host-specific system configuration files.",
+                importance: "critical",
+                contents: [
+                    "System-wide configuration files",
+                    "Startup scripts in <code>/etc/init.d</code>",
+                    "Network config in <code>/etc/network</code>",
+                    "User database in <code>/etc/passwd</code>"
+                ]
+            },
+            {
+                name: "usr/local/etc",
+                path: "/usr/local/etc",
+                description: "Configuration for locally installed programs.",
+                importance: "important",
+                contents: [
+                    "Configuration for software in /usr/local",
+                    "Analogous to /etc but for local software"
+                ]
+            },
+            
+            // DATA
+            {
+                name: "home",
+                path: "/home",
+                description: "User home directories containing personal files.",
+                importance: "important",
+                contents: [
+                    "Typically one subdirectory per user",
+                    "User configuration files (dotfiles)",
+                    "Often on a separate partition"
+                ]
+            },
+            {
+                name: "root",
+                path: "/root",
+                description: "Home directory for the root user.",
+                importance: "critical",
+                contents: [
+                    "Root user's personal files and config",
+                    "Not in /home for security reasons"
+                ]
+            },
+            {
+                name: "var",
+                path: "/var",
+                description: "Variable data files that change during operation.",
+                importance: "important",
+                contents: [
+                    "Log files in <code>/var/log</code>",
+                    "Spool files in <code>/var/spool</code>",
+                    "Temporary files in <code>/var/tmp</code>",
+                    "Database files in <code>/var/lib</code>"
+                ]
+            },
+            {
+                name: "tmp",
+                path: "/tmp",
+                description: "Temporary files deleted on reboot.",
+                importance: "standard",
+                contents: [
+                    "World-writable space for temporary files",
+                    "Often mounted as tmpfs in memory",
+                    "Files may be deleted at any time"
+                ]
+            },
+            
+            // SYSTEM
+            {
+                name: "dev",
+                path: "/dev",
+                description: "Device files representing hardware components.",
+                importance: "critical",
+                contents: [
+                    "Hard disks like <code>/dev/sda</code>",
+                    "Virtual devices like <code>/dev/null</code>",
+                    "Managed by udev in modern systems"
+                ]
+            },
+            {
+                name: "proc",
+                path: "/proc",
+                description: "Virtual filesystem providing process/kernel info.",
+                importance: "important",
+                contents: [
+                    "Process information in <code>/proc/[pid]</code>",
+                    "System information in files like <code>/proc/cpuinfo</code>",
+                    "Runtime configuration via <code>/proc/sys</code>"
+                ]
+            },
+            {
+                name: "sys",
+                path: "/sys",
+                description: "Virtual filesystem for devices/drivers/kernel info.",
+                importance: "important",
+                contents: [
+                    "Exposes kernel data structures",
+                    "Used for device and driver configuration",
+                    "Part of the modern Linux device model"
+                ]
+            },
+            {
+                name: "run",
+                path: "/run",
+                description: "Runtime variable data for running processes.",
+                importance: "important",
+                contents: [
+                    "PID files for services",
+                    "User session information",
+                    "Temporary system files needed at runtime"
+                ]
+            },
+            
+            // LIBRARIES
+            {
+                name: "lib",
+                path: "/lib",
+                description: "Essential shared libraries and kernel modules.",
+                importance: "critical",
+                contents: [
+                    "Libraries needed by binaries in /bin and /sbin",
+                    "Kernel modules in <code>/lib/modules</code>",
+                    "32-bit libraries on 64-bit systems"
+                ]
+            },
+            {
+                name: "usr/lib",
+                path: "/usr/lib",
+                description: "Libraries for binaries in /usr/bin and /usr/sbin.",
+                importance: "standard",
+                contents: [
+                    "Shared libraries for applications",
+                    "May include architecture-specific subdirectories",
+                    "Program data and helper files"
+                ]
+            }
+        ];
+
+        // Special filesystem locations
+        const specialLocations = [
+            {
+                name: "lost+found",
+                path: "/lost+found",
+                description: "Recovered files after filesystem repair.",
+                importance: "standard",
+                contents: [
+                    "Created by filesystem utilities like fsck",
+                    "Contains recovered files after corruption",
+                    "Each filesystem has its own lost+found"
+                ]
+            },
+            {
+                name: "mnt",
+                path: "/mnt",
+                description: "Temporary mount point for filesystems.",
+                importance: "standard",
+                contents: [
+                    "Temporarily mounted filesystems",
+                    "Often used by admins for manual mounts",
+                    "Empty by default"
+                ]
+            },
+            {
+                name: "media",
+                path: "/media",
+                description: "Mount point for removable media.",
+                importance: "standard",
+                contents: [
+                    "Automatic mounts of USB drives, CDs, etc.",
+                    "Typically has subdirectories by device or label",
+                    "Managed by automount systems"
+                ]
+            },
+            {
+                name: "opt",
+                path: "/opt",
+                description: "Optional application software packages.",
+                importance: "standard",
+                contents: [
+                    "Self-contained application bundles",
+                    "Often used by proprietary software",
+                    "Each package in its own subdirectory"
+                ]
+            },
+            {
+                name: "srv",
+                path: "/srv",
+                description: "Data for services provided by the system.",
+                importance: "standard",
+                contents: [
+                    "Website data for <code>/srv/www</code>",
+                    "FTP files for <code>/srv/ftp</code>",
+                    "Often used by web/FTP servers"
+                ]
+            }
+        ];
+
+        // Important configuration files
+        const configFiles = [
+            {
+                file: "fstab",
+                path: "/etc/fstab",
+                purpose: "Defines how disks/partitions are mounted at boot."
+            },
+            {
+                file: "passwd",
+                path: "/etc/passwd",
+                purpose: "User account information including home directory and shell."
+            },
+            {
+                file: "shadow",
+                path: "/etc/shadow",
+                purpose: "Secure user password hashes (readable only by root)."
+            },
+            {
+                file: "group",
+                path: "/etc/group",
+                purpose: "Defines user groups and their members."
+            },
+            {
+                file: "hosts",
+                path: "/etc/hosts",
+                purpose: "Static hostname to IP address mappings."
+            },
+            {
+                file: "resolv.conf",
+                path: "/etc/resolv.conf",
+                purpose: "DNS resolver configuration (may be auto-generated)."
+            },
+            {
+                file: "bashrc",
+                path: "~/.bashrc",
+                purpose: "User-specific Bash shell configuration."
+            },
+            {
+                file: "profile",
+                path: "~/.profile",
+                purpose: "User-specific environment and startup programs."
+            },
+            {
+                file: "ssh/config",
+                path: "~/.ssh/config",
+                purpose: "User-specific SSH client configuration."
+            },
+            {
+                file: "crontab",
+                path: "/etc/crontab",
+                purpose: "System-wide cron job definitions."
+            },
+            {
+                file: "sudoers",
+                path: "/etc/sudoers",
+                purpose: "Configuration for sudo command (edit with visudo)."
+            },
+            {
+                file: "apt/sources.list",
+                path: "/etc/apt/sources.list",
+                purpose: "Defines package repositories for APT (Debian/Ubuntu)."
+            },
+            {
+                file: "yum.repos.d/",
+                path: "/etc/yum.repos.d/",
+                purpose: "Directory containing YUM repository configs (RHEL/CentOS)."
+            },
+            {
+                file: "sysctl.conf",
+                path: "/etc/sysctl.conf",
+                purpose: "Kernel parameter configuration."
+            },
+            {
+                file: "modules",
+                path: "/etc/modules",
+                purpose: "Kernel modules to load at boot."
+            }
+        ];
+
+        // Function to render the filesystem directories
+        function renderFilesystem(items, elementId) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = '';
+
+            if (items.length === 0) {
+                element.innerHTML = `
+                    <div class="no-results">
+                        <h3>No directories found</h3>
+                        <p>Try adjusting your search criteria or filters.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            items.forEach(item => {
+                const dirCard = document.createElement('div');
+                dirCard.className = 'dir-card';
+
+                const importanceClass = item.importance === 'critical' ? 'critical' : 
+                                      item.importance === 'important' ? 'important' : 
+                                      'standard';
+
+                dirCard.innerHTML = `
+                    <div class="dir-name">${item.name}</div>
+                    <div class="dir-path">${item.path}</div>
+                    <div class="importance ${importanceClass}">${item.importance}</div>
+                    <div class="dir-description">${item.description}</div>
+                    <div class="dir-contents">
+                        <h4>Typical Contents:</h4>
+                        <ul>
+                            ${item.contents.map(content => `<li>${content}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+
+                element.appendChild(dirCard);
+            });
+        }
+
+        // Function to render config files table
+        function renderConfigFiles() {
+            const configFilesList = document.getElementById('config-files-list');
+            configFilesList.innerHTML = '';
+
+            configFiles.forEach(file => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td><code>${file.file}</code></td>
+                    <td><code>${file.path}</code></td>
+                    <td>${file.purpose}</td>
+                `;
+                
+                configFilesList.appendChild(row);
+            });
+        }
+
+        // Function to filter directories
+        function filterDirectories() {
+            const searchTerm = document.getElementById('search').value.toLowerCase();
+            const importanceFilter = document.getElementById('importance-filter').value;
+
+            const filteredDirs = linuxFilesystem.filter(dir => {
+                // Check search term
+                const searchMatch = 
+                    dir.name.toLowerCase().includes(searchTerm) ||
+                    dir.path.toLowerCase().includes(searchTerm) ||
+                    dir.description.toLowerCase().includes(searchTerm) ||
+                    dir.contents.some(content => content.toLowerCase().includes(searchTerm));
+
+                // Check importance filter
+                const importanceMatch = importanceFilter === 'all' || dir.importance === importanceFilter;
+
+                return searchMatch && importanceMatch;
+            });
+
+            const filteredSpecial = specialLocations.filter(dir => {
+                // Check search term
+                const searchMatch = 
+                    dir.name.toLowerCase().includes(searchTerm) ||
+                    dir.path.toLowerCase().includes(searchTerm) ||
+                    dir.description.toLowerCase().includes(searchTerm) ||
+                    dir.contents.some(content => content.toLowerCase().includes(searchTerm));
+
+                // Check importance filter
+                const importanceMatch = importanceFilter === 'all' || dir.importance === importanceFilter;
+
+                return searchMatch && importanceMatch;
+            });
+
+            renderFilesystem(filteredDirs, 'filesystem-grid');
+            renderFilesystem(filteredSpecial, 'special-grid');
+        }
+
+        // Event listeners
+        document.getElementById('search').addEventListener('input', filterDirectories);
+        document.getElementById('importance-filter').addEventListener('change', filterDirectories);
+        document.getElementById('reset').addEventListener('click', () => {
+            document.getElementById('search').value = '';
+            document.getElementById('importance-filter').value = 'all';
+            filterDirectories();
+        });
+
+        // Initial render
+        renderFilesystem(linuxFilesystem, 'filesystem-grid');
+        renderFilesystem(specialLocations, 'special-grid');
+        renderConfigFiles();
+    </script>
+</body>
+</html>

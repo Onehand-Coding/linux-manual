@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux Command Reference Tool</title>
+    <link  rel="stylesheet" href="css/styles.css"/>
+</head>
+<body>
+    <h1>Linux Command Reference Tool</h1>
+    
+    <div class="search-container">
+        <input type="text" id="search" placeholder="Search commands...">
+        <select id="level-filter">
+            <option value="all">All Levels</option>
+            <option value="basic">Basic</option>
+            <option value="intermediate">Intermediate</option>
+            <option value="advanced">Advanced</option>
+        </select>
+        <select id="category-filter">
+            <option value="all">All Categories</option>
+            <option value="file">File Operations</option>
+            <option value="directory">Directory Operations</option>
+            <option value="system">System Info</option>
+            <option value="process">Process Management</option>
+            <option value="user">User Management</option>
+            <option value="network">Networking</option>
+            <option value="text">Text Processing</option>
+            <option value="permission">Permissions</option>
+            <option value="package">Package Management</option>
+            <option value="compression">Compression</option>
+            <option value="search">Search</option>
+            <option value="disk">Disk Operations</option>
+        </select>
+        <button id="reset">Reset</button>
+    </div>
+    
+    <div class="command-list" id="command-list">
+        <!-- Commands will be populated here by JavaScript -->
+    </div>
+
+    <div class="bottom-back-to-index-container">
+        <a href="../index.html" class="back-to-index-btn">&larr; Back to Main Index</a>
+    </div>
+
+    <footer>
+        Commands - Linux Manual
+    </footer>
+
+    <script>
+        // Define Linux commands database
+        const linuxCommands = [
+            // BASIC COMMANDS
+            {
+                name: "ls",
+                syntax: "ls [options] [directory]",
+                description: "Lists the contents of a directory.",
+                examples: "ls -la ~/Documents",
+                level: "basic",
+                category: "directory",
+                manLink: "https://man7.org/linux/man-pages/man1/ls.1.html",
+                tags: ["list", "directory", "files"]
+            },
+            {
+                name: "cd",
+                syntax: "cd [directory]",
+                description: "Changes the current working directory.",
+                examples: "cd /var/log\ncd ..\ncd ~",
+                level: "basic",
+                category: "directory",
+                manLink: "https://man7.org/linux/man-pages/man1/cd.1p.html",
+                tags: ["change", "directory", "navigation"]
+            },
+            {
+                name: "pwd",
+                syntax: "pwd",
+                description: "Prints the current working directory.",
+                examples: "pwd",
+                level: "basic",
+                category: "directory",
+                manLink: "https://man7.org/linux/man-pages/man1/pwd.1.html",
+                tags: ["print", "working", "directory", "current"]
+            },
+            {
+                name: "mkdir",
+                syntax: "mkdir [options] directory_name",
+                description: "Creates a new directory.",
+                examples: "mkdir new_folder\nmkdir -p parent/child/grandchild",
+                level: "basic",
+                category: "directory",
+                manLink: "https://man7.org/linux/man-pages/man1/mkdir.1.html",
+                tags: ["make", "create", "directory", "folder"]
+            },
+            {
+                name: "rmdir",
+                syntax: "rmdir [options] directory_name",
+                description: "Removes empty directories.",
+                examples: "rmdir empty_folder",
+                level: "basic",
+                category: "directory",
+                manLink: "https://man7.org/linux/man-pages/man1/rmdir.1.html",
+                tags: ["remove", "delete", "directory", "folder"]
+            },
+            {
+                name: "rm",
+                syntax: "rm [options] file_name",
+                description: "Removes files or directories.",
+                examples: "rm file.txt\nrm -r directory\nrm -rf directory",
+                level: "basic",
+                category: "file",
+                manLink: "https://man7.org/linux/man-pages/man1/rm.1.html",
+                tags: ["remove", "delete", "file", "directory"]
+            },
+            {
+                name: "cp",
+                syntax: "cp [options] source destination",
+                description: "Copies files and directories.",
+                examples: "cp file.txt backup/\ncp -r directory backup/",
+                level: "basic",
+                category: "file",
+                manLink: "https://man7.org/linux/man-pages/man1/cp.1.html",
+                tags: ["copy", "file", "directory", "duplicate"]
+            },
+            {
+                name: "mv",
+                syntax: "mv [options] source destination",
+                description: "Moves or renames files and directories.",
+                examples: "mv file.txt new_name.txt\nmv file.txt /new/location/",
+                level: "basic",
+                category: "file",
+                manLink: "https://man7.org/linux/man-pages/man1/mv.1.html",
+                tags: ["move", "rename", "file", "directory"]
+            },
+            {
+                name: "cat",
+                syntax: "cat [options] file_name",
+                description: "Displays the contents of a file.",
+                examples: "cat file.txt\ncat -n file.txt",
+                level: "basic",
+                category: "file",
+                manLink: "https://man7.org/linux/man-pages/man1/cat.1.html",
+                tags: ["concatenate", "display", "file", "view"]
+            },
+            {
+                name: "touch",
+                syntax: "touch [options] file_name",
+                description: "Creates an empty file or updates a file's timestamp.",
+                examples: "touch new_file.txt",
+                level: "basic",
+                category: "file",
+                manLink: "https://man7.org/linux/man-pages/man1/touch.1.html",
+                tags: ["create", "update", "timestamp", "file"]
+            },
+            {
+                name: "man",
+                syntax: "man command_name",
+                description: "Displays the manual page for a command.",
+                examples: "man ls",
+                level: "basic",
+                category: "system",
+                manLink: "https://man7.org/linux/man-pages/man1/man.1.html",
+                tags: ["manual", "help", "documentation"]
+            },
+            {
+                name: "clear",
+                syntax: "clear",
+                description: "Clears the terminal screen.",
+                examples: "clear",
+                level: "basic",
+                category: "system",
+                manLink: "https://man7.org/linux/man-pages/man1/clear.1.html",
+                tags: ["screen", "terminal", "clean"]
+            },
+            {
+                name: "echo",
+                syntax: "echo [options] [string]",
+                description: "Displays a line of text.",
+                examples: "echo 'Hello World'\necho $PATH",
+                level: "basic",
+                category: "system",
+                manLink: "https://man7.org/linux/man-pages/man1/echo.1.html",
+                tags: ["print", "display", "output", "text"]
+            },
+            {
+                name: "date",
+                syntax: "date [options]",
+                description: "Displays or sets the system date and time.",
+                examples: "date\ndate +\"%Y-%m-%d\"",
+                level: "basic",
+                category: "system",
+                manLink: "https://man7.org/linux/man-pages/man1/date.1.html",
+                tags: ["time", "clock", "calendar"]
+            },
+
+            // INTERMEDIATE COMMANDS
+            {
+                name: "grep",
+                syntax: "grep [options] pattern [file...]",
+                description: "Searches for patterns in files or standard input.",
+                examples: "grep 'error' log.txt\ngrep -i 'warning' *.log",
+                level: "intermediate",
+                category: "text",
+                manLink: "https://man7.org/linux/man-pages/man1/grep.1.html",
+                tags: ["search", "filter", "pattern", "text"]
+            },
+            {
+                name: "find",
+                syntax: "find [path] [expression]",
+                description: "Searches for files and directories within a specified path.",
+                examples: "find . -name '*.txt'\nfind /var -type d -name 'log'",
+                level: "intermediate",
+                category: "search",
+                manLink: "https://man7.org/linux/man-pages/man1/find.1.html",
+                tags: ["search", "locate", "file", "directory"]
+            },
+            {
+                name: "ps",
+                syntax: "ps [options]",
+                description: "Reports information about active processes.",
+                examples: "ps aux\nps -ef | grep nginx",
+                level: "intermediate",
+                category: "process",
+                manLink: "https://man7.org/linux/man-pages/man1/ps.1.html",
+                tags: ["process", "status", "running", "programs"]
+            },
+            {
+                name: "kill",
+                syntax: "kill [options] PID",
+                description: "Terminates processes by sending signals.",
+                examples: "kill 1234\nkill -9 5678",
+                level: "intermediate",
+                category: "process",
+                manLink: "https://man7.org/linux/man-pages/man1/kill.1.html",
+                tags: ["terminate", "process", "signal", "stop"]
+            },
+            {
+                name: "chmod",
+                syntax: "chmod [options] mode file(s)",
+                description: "Changes file permissions.",
+                examples: "chmod 755 script.sh\nchmod u+x file.txt",
+                level: "intermediate",
+                category: "permission",
+                manLink: "https://man7.org/linux/man-pages/man1/chmod.1.html",
+                tags: ["permissions", "rights", "security", "access"]
+            },
+            {
+                name: "chown",
+                syntax: "chown [options] user[:group] file(s)",
+                description: "Changes file owner and group.",
+                examples: "chown user:group file.txt\nchown -R www-data:www-data /var/www",
+                level: "intermediate",
+                category: "permission",
+                manLink: "https://man7.org/linux/man-pages/man1/chown.1.html",
+                tags: ["owner", "group", "permissions", "security"]
+            },
+            {
+                name: "tar",
+                syntax: "tar [options] [archive-file] [file(s)]",
+                description: "Archives and extracts files.",
+                examples: "tar -czvf archive.tar.gz directory/\ntar -xzvf archive.tar.gz",
+                level: "intermediate",
+                category: "compression",
+                manLink: "https://man7.org/linux/man-pages/man1/tar.1.html",
+                tags: ["archive", "compress", "extract", "package"]
+            },
+            {
+                name: "gzip",
+                syntax: "gzip [options] file(s)",
+                description: "Compresses files using the gzip algorithm.",
+                examples: "gzip file.txt\ngzip -d file.txt.gz",
+                level: "intermediate",
+                category: "compression",
+                manLink: "https://man7.org/linux/man-pages/man1/gzip.1.html",
+                tags: ["compress", "decompress", "archive"]
+            },
+            {
+                name: "df",
+                syntax: "df [options]",
+                description: "Reports filesystem disk space usage.",
+                examples: "df -h\ndf -i",
+                level: "intermediate",
+                category: "disk",
+                manLink: "https://man7.org/linux/man-pages/man1/df.1.html",
+                tags: ["disk", "space", "filesystem", "storage"]
+            },
+            {
+                name: "du",
+                syntax: "du [options] [file(s)]",
+                description: "Estimates file and directory space usage.",
+                examples: "du -sh *\ndu -h --max-depth=1 /var",
+                level: "intermediate",
+                category: "disk",
+                manLink: "https://man7.org/linux/man-pages/man1/du.1.html",
+                tags: ["disk", "usage", "space", "size"]
+            },
+            {
+                name: "top",
+                syntax: "top [options]",
+                description: "Displays dynamic real-time information about processes.",
+                examples: "top\ntop -u username",
+                level: "intermediate",
+                category: "process",
+                manLink: "https://man7.org/linux/man-pages/man1/top.1.html",
+                tags: ["process", "monitor", "resource", "usage"]
+            },
+            {
+                name: "crontab",
+                syntax: "crontab [options]",
+                description: "Schedules commands to run periodically.",
+                examples: "crontab -e\ncrontab -l",
+                level: "intermediate",
+                category: "system",
+                manLink: "https://man7.org/linux/man-pages/man1/crontab.1.html",
+                tags: ["schedule", "automate", "periodic", "task"]
+            },
+            {
+                name: "scp",
+                syntax: "scp [options] source destination",
+                description: "Securely copies files between hosts on a network.",
+                examples: "scp file.txt user@host:/path\nscp -r directory/ user@host:/path",
+                level: "intermediate",
+                category: "network",
+                manLink: "https://man7.org/linux/man-pages/man1/scp.1.html",
+                tags: ["secure", "copy", "remote", "transfer"]
+            },
+            {
+                name: "ssh",
+                syntax: "ssh [options] user@host",
+                description: "Securely logs into a remote machine.",
+                examples: "ssh user@host\nssh -p 2222 user@host",
+                level: "intermediate",
+                category: "network",
+                manLink: "https://man7.org/linux/man-pages/man1/ssh.1.html",
+                tags: ["secure", "shell", "remote", "login"]
+            },
+            {
+                name: "sed",
+                syntax: "sed [options] 'command' file(s)",
+                description: "Stream editor for filtering and transforming text.",
+                examples: "sed 's/old/new/g' file.txt\nsed -i '1d' file.txt",
+                level: "intermediate",
+                category: "text",
+                manLink: "https://man7.org/linux/man-pages/man1/sed.1.html",
+                tags: ["text", "editor", "stream", "substitute"]
+            },
+            {
+                name: "awk",
+                syntax: "awk [options] 'program' file(s)",
+                description: "Pattern scanning and text processing language.",
+                examples: "awk '{print $1}' file.txt\nawk -F: '{print $1}' /etc/passwd",
+                level: "intermediate",
+                category: "text",
+                manLink: "https://man7.org/linux/man-pages/man1/awk.1.html",
+                tags: ["text", "processing", "pattern", "matching"]
+            },
+
+            // ADVANCED COMMANDS
+            {
+                name: "iptables",
+                syntax: "iptables [options] [chain] [rule]",
+                description: "Administration tool for IPv4 packet filtering and NAT.",
+                examples: "iptables -L\niptables -A INPUT -p tcp --dport 22 -j ACCEPT",
+                level: "advanced",
+                category: "network",
+                manLink: "https://man7.org/linux/man-pages/man8/iptables.8.html",
+                tags: ["firewall", "security", "network", "filter"]
+            },
+            {
+                name: "netstat",
+                syntax: "netstat [options]",
+                description: "Displays network connections, routing tables, and interface statistics.",
+                examples: "netstat -tuln\nnetstat -anp",
+                level: "advanced",
+                category: "network",
+                manLink: "https://man7.org/linux/man-pages/man8/netstat.8.html",
+                tags: ["network", "connections", "ports", "stats"]
+            },
+            {
+                name: "lsof",
+                syntax: "lsof [options]",
+                description: "Lists open files and the processes that opened them.",
+                examples: "lsof -i:80\nlsof -p 1234",
+                level: "advanced",
+                category: "process",
+                manLink: "https://man7.org/linux/man-pages/man8/lsof.8.html",
+                tags: ["files", "open", "process", "list"]
+            },
+            {
+                name: "strace",
+                syntax: "strace [options] command",
+                description: "Traces system calls and signals.",
+                examples: "strace ls\nstrace -p 1234",
+                level: "advanced",
+                category: "process",
+                manLink: "https://man7.org/linux/man-pages/man1/strace.1.html",
+                tags: ["system", "calls", "debug", "trace"]
+            },
+            {
+                name: "tcpdump",
+                syntax: "tcpdump [options] [expression]",
+                description: "Dumps traffic on a network.",
+                examples: "tcpdump -i eth0\ntcpdump port 80",
+                level: "advanced",
+                category: "network",
+                manLink: "https://man7.org/linux/man-pages/man1/tcpdump.1.html",
+                tags: ["network", "packet", "capture", "traffic"]
+            },
+            {
+                name: "dd",
+                syntax: "dd [operands]",
+                description: "Converts and copies files.",
+                examples: "dd if=/dev/zero of=file bs=1M count=10\ndd if=/dev/sda of=backup.img",
+                level: "advanced",
+                category: "disk",
+                manLink: "https://man7.org/linux/man-pages/man1/dd.1.html",
+                tags: ["disk", "copy", "convert", "backup"]
+            },
+            {
+                name: "rsync",
+                syntax: "rsync [options] source destination",
+                description: "Fast, versatile file copying tool.",
+                examples: "rsync -avz source/ dest/\nrsync -avz --delete source/ dest/",
+                level: "advanced",
+                category: "file",
+                manLink: "https://man7.org/linux/man-pages/man1/rsync.1.html",
+                tags: ["sync", "copy", "backup", "transfer"]
+            },
+            {
+                name: "systemctl",
+                syntax: "systemctl [options] command [name]",
+                description: "Controls the systemd system and service manager.",
+                examples: "systemctl status nginx\nsystemctl restart apache2",
+                level: "advanced",
+                category: "system",
+                manLink: "https://man7.org/linux/man-pages/man1/systemctl.1.html",
+                tags: ["service", "system", "manage", "control"]
+            },
+            {
+                name: "journalctl",
+                syntax: "journalctl [options]",
+                description: "Queries the systemd journal.",
+                examples: "journalctl -u nginx\njournalctl -f",
+                level: "advanced",
+                category: "system",
+                manLink: "https://man7.org/linux/man-pages/man1/journalctl.1.html",
+                tags: ["logs", "journal", "system", "debug"]
+            },
+            {
+                name: "nmcli",
+                syntax: "nmcli [options] object command",
+                description: "Command-line tool for controlling NetworkManager.",
+                examples: "nmcli dev status\nnmcli con show",
+                level: "advanced",
+                category: "network",
+                manLink: "https://man7.org/linux/man-pages/man1/nmcli.1.html",
+                tags: ["network", "connection", "wifi", "ethernet"]
+            },
+            {
+                name: "fdisk",
+                syntax: "fdisk [options] device",
+                description: "Manipulates disk partition tables.",
+                examples: "fdisk -l\nfdisk /dev/sda",
+                level: "advanced",
+                category: "disk",
+                manLink: "https://man7.org/linux/man-pages/man8/fdisk.8.html",
+                tags: ["partition", "disk", "format", "table"]
+            },
+            {
+                name: "lsblk",
+                syntax: "lsblk [options]",
+                description: "Lists block devices.",
+                examples: "lsblk\nlsblk -f",
+                level: "advanced",
+                category: "disk",
+                manLink: "https://man7.org/linux/man-pages/man8/lsblk.8.html",
+                tags: ["block", "device", "disk", "list"]
+            },
+            {
+                name: "tee",
+                syntax: "tee [options] file(s)",
+                description: "Reads from standard input and writes to standard output and files.",
+                examples: "echo 'hello' | tee file.txt\nls -la | tee output.txt",
+                level: "advanced",
+                category: "text",
+                manLink: "https://man7.org/linux/man-pages/man1/tee.1.html",
+                tags: ["output", "input", "redirect", "pipe"]
+            },
+            {
+                name: "xargs",
+                syntax: "xargs [options] [command]",
+                description: "Builds and executes command lines from standard input.",
+                examples: "find . -name '*.txt' | xargs rm\ncat files.txt | xargs cat",
+                level: "advanced",
+                category: "system",
+                manLink: "https://man7.org/linux/man-pages/man1/xargs.1.html",
+                tags: ["execute", "pipeline", "args", "build"]
+            },
+            {
+                name: "nice",
+                syntax: "nice [options] command",
+                description: "Runs a command with modified scheduling priority.",
+                examples: "nice -n 19 tar -czf archive.tar.gz files/",
+                level: "advanced",
+                category: "process",
+                manLink: "https://man7.org/linux/man-pages/man1/nice.1.html",
+                tags: ["priority", "schedule", "process", "niceness"]
+            }
+        ];
+
+        // Function to render the commands list
+        function renderCommands(commands) {
+            const commandListElement = document.getElementById('command-list');
+            commandListElement.innerHTML = '';
+
+            if (commands.length === 0) {
+                commandListElement.innerHTML = `
+                    <div class="no-results">
+                        <h3>No commands found</h3>
+                        <p>Try adjusting your search criteria or filters.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            commands.forEach(command => {
+                const commandCard = document.createElement('div');
+                commandCard.className = 'command-card';
+
+                const levelClass = command.level === 'basic' ? 'basic' : 
+                                   command.level === 'intermediate' ? 'intermediate' : 
+                                   'advanced';
+
+                commandCard.innerHTML = `
+                    <div class="command-name">${command.name}</div>
+                    <div class="command-tags">
+                        <span class="level ${levelClass}">${command.level}</span>
+                        <span class="category">${getCategoryDisplayName(command.category)}</span>
+                    </div>
+                    <div class="command-syntax">${command.syntax}</div>
+                    <div class="command-description">${command.description}</div>
+                    <div class="command-example"><strong>Example:</strong><br>${command.examples.replace(/\n/g, '<br>')}</div>
+                    <div class="learn-more">
+                        <a href="${command.manLink}" target="_blank">View Manual Page</a>
+                    </div>
+                `;
+
+                commandListElement.appendChild(commandCard);
+            });
+        }
+
+        // Function to get display name for category
+        function getCategoryDisplayName(category) {
+            const categories = {
+                'file': 'File Operations',
+                'directory': 'Directory Ops',
+                'system': 'System Info',
+                'process': 'Process Mgmt',
+                'user': 'User Mgmt',
+                'network': 'Networking',
+                'text': 'Text Processing',
+                'permission': 'Permissions',
+                'package': 'Package Mgmt',
+                'compression': 'Compression',
+                'search': 'Search',
+                'disk': 'Disk Operations'
+            };
+            
+            return categories[category] || category;
+        }
+
+        // Function to filter commands
+        function filterCommands() {
+            const searchTerm = document.getElementById('search').value.toLowerCase();
+            const levelFilter = document.getElementById('level-filter').value;
+            const categoryFilter = document.getElementById('category-filter').value;
+
+            const filteredCommands = linuxCommands.filter(command => {
+                // Check search term
+                const searchMatch = 
+                    command.name.toLowerCase().includes(searchTerm) ||
+                    command.description.toLowerCase().includes(searchTerm) ||
+                    command.tags.some(tag => tag.toLowerCase().includes(searchTerm));
+
+                // Check level filter
+                const levelMatch = levelFilter === 'all' || command.level === levelFilter;
+
+                // Check category filter
+                const categoryMatch = categoryFilter === 'all' || command.category === categoryFilter;
+
+                return searchMatch && levelMatch && categoryMatch;
+            });
+
+            renderCommands(filteredCommands);
+        }
+
+        // Event listeners
+        document.getElementById('search').addEventListener('input', filterCommands);
+        document.getElementById('level-filter').addEventListener('change', filterCommands);
+        document.getElementById('category-filter').addEventListener('change', filterCommands);
+        document.getElementById('reset').addEventListener('click', () => {
+            document.getElementById('search').value = '';
+            document.getElementById('level-filter').value = 'all';
+            document.getElementById('category-filter').value = 'all';
+            filterCommands();
+        });
+
+        // Initial render
+        renderCommands(linuxCommands);
+    </script>
+</body>
+</html>

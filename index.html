@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux Manual - Home</title>
+    <link rel="stylesheet" href="manuals/css/styles.css">
+    <style>
+        /* Additional styles for the index page - can be moved to styles.css */
+        body {
+            max-width: 900px; /* Slightly narrower for a landing page */
+        }
+        .container {
+            padding: 20px;
+        }
+        .intro {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .intro p {
+            font-size: 1.1em;
+            color: var(--text-secondary);
+        }
+        .manual-sections {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            list-style: none;
+            padding: 0;
+        }
+        .manual-sections li a {
+            display: block;
+            background-color: var(--card-bg);
+            color: var(--primary-color);
+            padding: 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 1.2em;
+            font-weight: bold;
+            transition: background-color 0.2s, transform 0.2s;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+        .manual-sections li a:hover {
+            background-color: var(--hover-color);
+            transform: translateY(-3px);
+            color: var(--secondary-color);
+        }
+        footer {
+            margin-top: 50px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="intro">
+            <h1>Welcome to the Linux Manual</h1>
+            <p>Your comprehensive, interactive guide to the Linux world. Navigate through various topics using the sections below.</p>
+        </header>
+
+        <main>
+            <h2>Manual Sections</h2>
+            <ul class="manual-sections">
+                <li><a href="manuals/linux_commands.html">Linux Commands</a></li>
+                <li><a href="manuals/linux_filesystem.html">Linux Filesystem</a></li>
+                <li><a href="manuals/system_administration.html">System Administration</a></li>
+                <li><a href="manuals/networking.html">Networking</a></li>
+                <li><a href="manuals/security.html">Security</a></li>
+                <li><a href="manuals/package_management.html">Package Management</a></li>
+                <li><a href="manuals/shell_scripting.html">Shell & Scripting</a></li>
+                <li><a href="manuals/development.html">Development</a></li>
+                <li><a href="manuals/cloud_devops.html">Cloud & DevOps</a></li>
+                <li><a href="manuals/hardware.html">Hardware</a></li>
+            </ul>
+        </main>
+
+        <footer>
+            <p>&copy; <span id="currentYear"></span> Linux Manual Project. Happy Hacking!</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>

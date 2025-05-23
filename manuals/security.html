@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux Manual - Security</title>
+    <link rel="stylesheet" href="css/styles.css"/>
+</head>
+<body>
+    <h1>Linux Manual - Security</h1>
+
+    <div class="search-container">
+        <input type="text" id="search" placeholder="Search security topics...">
+        <select id="category-filter">
+            <option value="all">All Categories</option>
+            <option value="permissions">Permissions</option>
+            <option value="ssh">SSH</option>
+            <option value="auditing">Auditing & Defense</option>
+            </select>
+        <button id="reset">Reset</button>
+    </div>
+
+    <div class="command-list" id="content-list">
+        </div>
+
+    <div class="bottom-back-to-index-container">
+        <a href="../index.html" class="back-to-index-btn">&larr; Back to Main Index</a>
+    </div>
+
+    <footer>
+        Security - Linux Manual
+    </footer>
+
+    <script>
+        const securityData = [
+            // Permissions
+            {
+                name: "chmod symbolic notation",
+                syntax: "chmod [ugoa][+-=][rwxXst] file/directory",
+                description: "Change file permissions using symbolic notation (user, group, other, all; add, remove, set; read, write, execute, special execute, sticky, setuid/gid).",
+                examples: "chmod u+x script.sh # Add execute for user\nchmod g-w,o-w private_file # Remove write for group and other\nchmod a=r public_info.txt # Set read for all\nchmod +X directory/ # Add execute only if it's a directory or already has execute for someone",
+                level: "basic",
+                category: "permissions",
+                tags: ["chmod", "permissions", "symbolic", "security", "file", "access"]
+            },
+            {
+                name: "chmod octal notation",
+                syntax: "chmod [octal] file/directory",
+                description: "Change file permissions using octal numbers (e.g., 755, 644). Each digit represents user, group, and other. (4=read, 2=write, 1=execute).",
+                examples: "chmod 755 script.sh # rwxr-xr-x\nchmod 600 private_key.pem # rw-------\nchmod 644 config.txt # rw-r--r--",
+                level: "basic",
+                category: "permissions",
+                tags: ["chmod", "permissions", "octal", "security", "file", "access"]
+            },
+            {
+                name: "chown [user]:[group] [file/directory]",
+                syntax: "chown www-data:www-data /var/www/html",
+                description: "Change file owner and group.",
+                examples: "sudo chown myuser:mygroup myfile.txt\nsudo chown -R user1: /home/user1/docs # Recursively change owner for all files in docs\nsudo chown :webdev somefile.php # Change only group",
+                level: "basic",
+                category: "permissions",
+                tags: ["chown", "owner", "group", "permissions", "security", "access"]
+            },
+            {
+                name: "chgrp [group] [file/directory]",
+                syntax: "chgrp developers project_file",
+                description: "Change file group ownership (less common than chown user:group).",
+                examples: "sudo chgrp staff shared_document.odt",
+                level: "intermediate",
+                category: "permissions",
+                tags: ["chgrp", "group", "permissions", "security", "access"]
+            },
+            {
+                name: "Special Permissions (setuid, setgid, sticky bit)",
+                description: "Understanding setuid, setgid, and sticky bit permissions and their security implications.",
+                category: "permissions",
+                level: "advanced",
+                examples: "setuid (s or S on user execute bit): chmod u+s /usr/bin/someprogram (binary runs with owner's privileges). Octal: 4xxx.\nsetgid (s or S on group execute bit): chmod g+s /path/to/directory (new files/dirs inherit directory's group). Octal: 2xxx.\nSticky bit (t or T on other execute bit): chmod +t /tmp (in a directory, only file owner, dir owner, or root can delete/rename files). Octal: 1xxx.",
+                tags: ["setuid", "setgid", "sticky bit", "permissions", "advanced", "security", "access"]
+            },
+            {
+                name: "ACLs (Access Control Lists) - getfacl/setfacl",
+                syntax: "setfacl -m u:username:rwx file",
+                description: "Manage fine-grained permissions beyond the traditional user/group/other model.",
+                examples: "getfacl myfile.txt # View ACLs\nsetfacl -m u:john:rw- myfile.txt # Give John read-write access\nsetfacl -m g:editors:rwx project_dir # Give editors group rwx access\nsetfacl -x u:john myfile.txt # Remove ACL entry for John\nsetfacl -b myfile.txt # Remove all ACLs",
+                level: "advanced",
+                category: "permissions",
+                tags: ["acl", "getfacl", "setfacl", "permissions", "advanced", "security", "access"]
+            },
+            // SSH
+            {
+                name: "ssh-keygen",
+                syntax: "ssh-keygen -t [type] -b [bits] -C \"comment\"",
+                description: "Generates SSH key pairs for passwordless authentication.",
+                examples: "ssh-keygen -t rsa -b 4096 -C \"my_email@example.com\"\nssh-keygen -t ed25519 -C \"workstation key\"",
+                level: "intermediate",
+                category: "ssh",
+                tags: ["ssh", "keygen", "keys", "security", "authentication", "public key", "private key"]
+            },
+            {
+                name: "ssh-copy-id [user]@[host]",
+                syntax: "ssh-copy-id user@server.example.com",
+                description: "Copies your public key to a remote server's authorized_keys file, enabling passwordless login.",
+                examples: "ssh-copy-id -i ~/.ssh/id_rsa.pub remoteuser@remotehost",
+                level: "intermediate",
+                category: "ssh",
+                tags: ["ssh", "ssh-copy-id", "keys", "authentication", "passwordless"]
+            },
+            {
+                name: "SSH Config File (~/.ssh/config)",
+                description: "Syntax and common options for user's SSH client configuration to simplify connections.",
+                category: "ssh",
+                level: "intermediate",
+                examples: "Host myserver\n  HostName server.example.com\n  User myremoteuser\n  Port 2222\n  IdentityFile ~/.ssh/id_rsa_myserver\n  ForwardAgent yes\n\nHost bastion\n  HostName bastion.example.com\n  User admin\n\nHost internal-server\n  HostName 192.168.1.100\n  ProxyJump bastion",
+                tags: ["ssh", "config", "client", "automation", "security", "alias", "proxyjump"]
+            },
+            {
+                name: "SSH Agent & ssh-add",
+                description: "Manages SSH private keys and avoids retyping passphrases.",
+                category: "ssh",
+                level: "intermediate",
+                examples: "eval $(ssh-agent -s) # Start the agent (often done by display manager)\nssh-add ~/.ssh/id_rsa # Add private key to agent (prompts for passphrase if set)\nssh-add -l # List keys in agent",
+                tags: ["ssh", "ssh-agent", "ssh-add", "keys", "passphrase", "security"]
+            },
+            {
+                name: "SSH Port Tunneling (Local & Remote)",
+                description: "Securely tunnel network traffic through SSH connections.",
+                category: "ssh",
+                level: "advanced",
+                examples: "Local Port Forwarding (-L):\n  ssh -L 8080:localhost:80 user@remotehost\n  (Access remotehost's port 80 via your local port 8080)\n\nRemote Port Forwarding (-R):\n  ssh -R 9090:localhost:3000 user@remotehost\n  (Expose your local port 3000 on remotehost's port 9090)\n\nDynamic Port Forwarding (SOCKS Proxy -D):\n  ssh -D 1080 user@remotehost\n  (Creates a SOCKS proxy on local port 1080 via remotehost)",
+                tags: ["ssh", "port forwarding", "tunneling", "local forward", "remote forward", "socks proxy", "security"]
+            },
+            // Auditing & Defense
+            {
+                name: "auditd & auditctl",
+                description: "The Linux Auditing System provides a way to track security-relevant information on your system. `auditctl` configures kernel audit rules.",
+                category: "auditing",
+                level: "advanced",
+                examples: "sudo auditctl -l # List current rules\nsudo auditctl -w /etc/passwd -p warx -k passwd_changes # Watch /etc/passwd for write, attr change, read, execute\nsudo auditctl -w /var/log/myapp/ -p wa -k myapp_logs\nsudo ausearch -k passwd_changes # Search audit logs for key 'passwd_changes'\nsudo aureport -u # User report",
+                tags: ["auditd", "auditctl", "ausearch", "aureport", "security", "logging", "monitoring", "compliance"]
+            },
+            {
+                name: "lynis",
+                syntax: "lynis audit system",
+                description: "Security auditing tool for Linux systems. Performs an extensive health scan.",
+                examples: "sudo lynis audit system\nsudo lynis audit system --quick # Faster scan, less detail",
+                level: "intermediate",
+                category: "auditing",
+                tags: ["lynis", "security", "audit", "scan", "hardening", "vulnerability"]
+            },
+            {
+                name: "fail2ban",
+                description: "Intrusion prevention software framework that protects computer servers from brute-force attacks.",
+                category: "auditing",
+                level: "intermediate",
+                examples: "Monitors log files (e.g., /var/log/auth.log) and bans IPs that show malicious signs.\nConfiguration: /etc/fail2ban/jail.conf, /etc/fail2ban/jail.local\nCommands:\n  sudo fail2ban-client status\n  sudo fail2ban-client status sshd\n  sudo fail2ban-client set sshd unbanip 1.2.3.4",
+                tags: ["fail2ban", "security", "brute-force", "ips", "ids", "defense", "firewall"]
+            }
+        ];
+
+        const sectionItems = securityData; // This line is crucial
+
+        function getCategoryDisplayName(category) {
+            const categories = {
+                'permissions': 'Permissions',
+                'ssh': 'SSH',
+                'auditing': 'Auditing & Defense'
+            };
+            return categories[category] || category.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        function renderItems(itemsToRender) {
+            const itemListElement = document.getElementById('content-list');
+            itemListElement.innerHTML = '';
+
+            if (itemsToRender.length === 0) {
+                itemListElement.innerHTML = `<div class="no-results"><h3>No entries found</h3><p>Try adjusting your search criteria.</p></div>`;
+                return;
+            }
+
+            itemsToRender.forEach(item => {
+                const itemCard = document.createElement('div');
+                itemCard.className = 'command-card';
+
+                const typeClass = item.level ? (item.level === 'basic' ? 'basic' : item.level === 'intermediate' ? 'intermediate' : 'advanced') : 'standard';
+
+                itemCard.innerHTML = `
+                    <div class="command-name">${item.name}</div>
+                    <div class="command-tags">
+                        ${item.category ? `<span class="category">${getCategoryDisplayName(item.category)}</span>` : ''}
+                        <span class="level ${typeClass}">${item.level || 'standard'}</span>
+                    </div>
+                    ${item.syntax ? `<div class="command-syntax">${item.syntax.replace(/\n/g, '<br>')}</div>` : ''}
+                    <div class="command-description">${item.description}</div>
+                    ${item.examples ? `<div class="command-example"><strong>Details/Examples:</strong><br>${item.examples.replace(/\n/g, '<br>')}</div>` : ''}
+                    ${item.manLink ? `<div class="learn-more"><a href="${item.manLink}" target="_blank">Learn More</a></div>` : ''}
+                `;
+                itemListElement.appendChild(itemCard);
+            });
+        }
+
+        function filterItems() {
+            const searchTerm = document.getElementById('search').value.toLowerCase();
+            const categoryFilter = document.getElementById('category-filter').value;
+
+            const filteredItems = sectionItems.filter(item => {
+                const searchMatch =
+                    item.name.toLowerCase().includes(searchTerm) ||
+                    item.description.toLowerCase().includes(searchTerm) ||
+                    (item.tags && item.tags.some(tag => tag.toLowerCase().includes(searchTerm))) ||
+                    (item.syntax && item.syntax.toLowerCase().includes(searchTerm)) ||
+                    (item.examples && item.examples.toLowerCase().includes(searchTerm));
+
+                const categoryMatch = categoryFilter === 'all' || item.category === categoryFilter;
+
+                return searchMatch && categoryMatch;
+            });
+
+            renderItems(filteredItems);
+        }
+
+        document.getElementById('search').addEventListener('input', filterItems);
+        document.getElementById('category-filter').addEventListener('change', filterItems);
+        document.getElementById('reset').addEventListener('click', () => {
+            document.getElementById('search').value = '';
+            document.getElementById('category-filter').value = 'all';
+            renderItems(sectionItems);
+        });
+
+        renderItems(sectionItems); // Initial render
+    </script>
+</body>
+</html>
