@@ -38,5 +38,3 @@ This manual is divided into the following sections:
 * **[Development](manuals/development_manual.html):** Tools and concepts for developers, including Git, Docker, and Kubernetes basics.
 * **[Cloud & DevOps](manuals/cloud_devops_manual.html):** Introduction to AWS CLI, Terraform, and CI/CD concepts.
 * **[Hardware](manuals/hardware_manual.html):** Inspecting and managing hardware components.
-
-## Project Structure
