@@ -1,0 +1,31 @@
+name: Deploy GitHub Pages
+
+on:
+  workflow_dispatch:   # allow manual "Run workflow"
+  push:
+    branches:
+      - master         # auto-trigger on push to master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .   # change this if your site build output is not root
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
