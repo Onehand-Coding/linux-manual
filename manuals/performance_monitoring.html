@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Monitoring</title>
+    <link rel="stylesheet" href="css/styles.css"/>
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+</head>
+<body>
+    <h1>Performance Monitoring</h1>
+    
+    <div class="search-container">
+        <input type="text" id="search" placeholder="Search tools or metrics...">
+        <select id="category-filter">
+            <option value="all">All Categories</option>
+            <option value="system">System</option>
+            <option value="process">Process</option>
+            <option value="network">Network</option>
+            <option value="disk">Disk</option>
+            <option value="memory">Memory</option>
+        </select>
+        <button id="reset">Reset</button>
+    </div>
+    
+    <div class="command-list" id="tool-list">
+        <!-- Tools will be populated here by JavaScript -->
+    </div>
+
+    <div class="bottom-back-to-index-container">
+        <a href="../index.html" class="back-to-index-btn">&larr; Back to Main Index</a>
+    </div>
+
+    <footer>
+        Performance Monitoring - Linux Manual
+    </footer>
+
+    <script>
+        // Define Performance Monitoring tools database
+        const performanceTools = [
+            {
+                name: "top",
+                syntax: "top",
+                description: "Displays real-time information about running processes, including CPU and memory usage.",
+                examples: "top\n# Press 'q' to quit",
+                level: "basic",
+                category: "process",
+                manLink: "https://man7.org/linux/man-pages/man1/top.1.html",
+                tags: ["process", "cpu", "memory", "real-time"]
+            },
+            {
+                name: "htop",
+                syntax: "htop",
+                description: "An interactive process viewer. An enhanced version of 'top' with a user-friendly interface.",
+                examples: "htop\n# Use arrow keys to navigate, F10 to quit",
+                level: "intermediate",
+                category: "process",
+                manLink: "https://man7.org/linux/man-pages/man1/htop.1.html",
+                tags: ["process", "cpu", "memory", "interactive"]
+            },
+            {
+                name: "ps",
+                syntax: "ps [options]",
+                description: "Reports a snapshot of the current processes.",
+                examples: "ps aux\nps -ef",
+                level: "basic",
+                category: "process",
+                manLink: "https://man7.org/linux/man-pages/man1/ps.1.html",
+                tags: ["process", "snapshot", "list"]
+            },
+            {
+                name: "vmstat",
+                syntax: "vmstat [delay [count]]",
+                description: "Reports information about processes, memory, paging, block IO, traps, disks, and CPU activity.",
+                examples: "vmstat 5\nvmstat 2 10",
+                level: "intermediate",
+                category: "system",
+                manLink: "https://man7.org/linux/man-pages/man8/vmstat.1.html",
+                tags: ["virtual", "memory", "statistics", "system"]
+            },
+            {
+                name: "iostat",
+                syntax: "iostat [options] [interval] [count]",
+                description: "Reports CPU statistics and input/output statistics for devices and partitions.",
+                examples: "iostat\niostat -x 5",
+                level: "intermediate",
+                category: "disk",
+                manLink: "https://man7.org/linux/man-pages/man1/iostat.1.html",
+                tags: ["io", "input", "output", "disk", "statistics"]
+            },
+            {
+                name: "sar",
+                syntax: "sar [options] [interval] [count]",
+                description: "Collects, reports, or saves system activity information.",
+                examples: "sar -u\nsar -r 1 5",
+                level: "advanced",
+                category: "system",
+                manLink: "https://man7.org/linux/man-pages/man1/sar.1.html",
+                tags: ["system", "activity", "report", "collector"]
+            },
+            {
+                name: "iotop",
+                syntax: "iotop [options]",
+                description: "A top-like utility for monitoring disk I/O usage by processes.",
+                examples: "iotop\nsudo iotop -o",
+                level: "intermediate",
+                category: "disk",
+                manLink: "https://man7.org/linux/man-pages/man1/iotop.1.html",
+                tags: ["io", "disk", "top", "process"]
+            },
+            {
+                name: "iftop",
+                syntax: "iftop [options]",
+                description: "Displays bandwidth usage on an interface by host.",
+                examples: "iftop\nsudo iftop -i eth0",
+                level: "intermediate",
+                category: "network",
+                manLink: "https://man7.org/linux/man-pages/man1/iftop.1.html",
+                tags: ["network", "bandwidth", "interface", "traffic"]
+            },
+            {
+                name: "nethogs",
+                syntax: "nethogs [options] [device]",
+                description: "Net top tool grouping bandwidth per process.",
+                examples: "nethogs\nsudo nethogs eth0",
+                level: "intermediate",
+                category: "network",
+                manLink: "https://man7.org/linux/man-pages/man1/nethogs.1.html",
+                tags: ["network", "bandwidth", "process"]
+            },
+            {
+                name: "free",
+                syntax: "free [options]",
+                description: "Displays amount of free and used memory in the system.",
+                examples: "free -h\nfree -m",
+                level: "basic",
+                category: "memory",
+                manLink: "https://man7.org/linux/man-pages/man1/free.1.html",
+                tags: ["memory", "ram", "swap"]
+            },
+            {
+                name: "uptime",
+                syntax: "uptime",
+                description: "Tells how long the system has been running, number of users, and load average.",
+                examples: "uptime",
+                level: "basic",
+                category: "system",
+                manLink: "https://man7.org/linux/man-pages/man1/uptime.1.html",
+                tags: ["system", "load", "time"]
+            }
+        ];
+
+        function displayTools(tools) {
+            const toolList = document.getElementById('tool-list');
+            toolList.innerHTML = '';
+
+            if (tools.length === 0) {
+                toolList.innerHTML = '<div class="no-results">No tools found matching the criteria.</div>';
+                return;
+            }
+
+            tools.forEach(tool => {
+                const toolCard = document.createElement('div');
+                toolCard.className = 'command-card';
+                
+                const levelClass = tool.level.toLowerCase();
+                const categoryClass = tool.category.toLowerCase();
+
+                toolCard.innerHTML = `
+                    <div class="command-name">${tool.name}</div>
+                    <div class="level ${levelClass}">${tool.level.charAt(0).toUpperCase() + tool.level.slice(1)}</div>
+                    <div class="category ${categoryClass}">${tool.category.charAt(0).toUpperCase() + tool.category.slice(1)}</div>
+                    <div class="command-syntax">${tool.syntax}</div>
+                    <div class="command-description">${tool.description}</div>
+                    <div class="command-example">
+                        <strong>Example:</strong><br>
+                        <code>${tool.examples.replace(/\n/g, '<br>')}</code>
+                    </div>
+                    <div class="command-tags">
+                        Tags: ${tool.tags.map(tag => `<span class="tag">${tag}</span>`).join(' ')}
+                    </div>
+                    <div class="learn-more">
+                        <a href="${tool.manLink}" target="_blank">Learn more (man page)</a>
+                    </div>
+                `;
+                toolList.appendChild(toolCard);
+            });
+        }
+
+        function filterTools() {
+            const searchTerm = document.getElementById('search').value.toLowerCase();
+            const categoryFilter = document.getElementById('category-filter').value;
+
+            const filteredTools = performanceTools.filter(tool => {
+                const matchesSearch = tool.name.toLowerCase().includes(searchTerm) ||
+                                     tool.description.toLowerCase().includes(searchTerm) ||
+                                     tool.tags.some(tag => tag.toLowerCase().includes(searchTerm));
+                
+                const matchesCategory = categoryFilter === 'all' || tool.category === categoryFilter;
+
+                return matchesSearch && matchesCategory;
+            });
+
+            displayTools(filteredTools);
+        }
+
+        function resetFilters() {
+            document.getElementById('search').value = '';
+            document.getElementById('category-filter').value = 'all';
+            displayTools(performanceTools);
+        }
+
+        document.getElementById('search').addEventListener('input', filterTools);
+        document.getElementById('category-filter').addEventListener('change', filterTools);
+        document.getElementById('reset').addEventListener('click', resetFilters);
+
+        // Initial display
+        displayTools(performanceTools);
+        
+        // Apply theme from localStorage
+        const currentTheme = localStorage.getItem('theme');
+        if (currentTheme === 'light') {
+            document.documentElement.classList.add('light-theme');
+        }
+    </script>
+</body>
+</html>

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Linux Manual - Home</title>
     <link rel="stylesheet" href="manuals/css/styles.css">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <style>
         /* Additional styles for the index page - can be moved to styles.css */
         body {
@@ -51,10 +52,34 @@
             border-top: 1px solid var(--border-color);
             padding-top: 20px;
         }
+        
+        /* Theme Toggle Button */
+        .theme-toggle-container {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .theme-toggle-btn {
+            padding: 8px 16px;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .theme-toggle-btn:hover {
+            background-color: var(--hover-color);
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="theme-toggle-container">
+            <button class="theme-toggle-btn" id="themeToggle">Toggle Theme</button>
+        </div>
+        
         <header class="intro">
             <h1>Welcome to the Linux Manual</h1>
             <p>Your comprehensive, interactive guide to the Linux world. Navigate through various topics using the sections below.</p>
@@ -73,6 +98,9 @@
                 <li><a href="manuals/development.html">Development</a></li>
                 <li><a href="manuals/cloud_devops.html">Cloud & DevOps</a></li>
                 <li><a href="manuals/hardware.html">Hardware</a></li>
+                <li><a href="manuals/performance_monitoring.html">Performance Monitoring</a></li>
+                <li><a href="manuals/text_processing.html">Text Processing</a></li>
+                <li><a href="manuals/virtualization_containers.html">Virtualization & Containers</a></li>
             </ul>
         </main>
 
@@ -82,7 +110,21 @@
     </div>
 
     <script>
+        // Update copyright year
         document.getElementById('currentYear').textContent = new Date().getFullYear();
+        
+        // Apply theme from localStorage or system preference
+        const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.classList.toggle('light-theme', currentTheme === 'light');
+        document.getElementById('themeToggle').textContent = currentTheme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode';
+
+        // Theme toggle functionality
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            const isLightTheme = document.documentElement.classList.toggle('light-theme');
+            const newTheme = isLightTheme ? 'light' : 'dark';
+            localStorage.setItem('theme', newTheme);
+            document.getElementById('themeToggle').textContent = isLightTheme ? 'Switch to Dark Mode' : 'Switch to Light Mode';
+        });
     </script>
 </body>
 </html>

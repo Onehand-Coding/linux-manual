@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Linux Manual - Networking</title>
     <link rel="stylesheet" href="css/styles.css"/>
-    </head>
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+</head>
 <body>
     <h1>Linux Manual - Networking</h1>
     <div class="search-container">
@@ -237,7 +238,14 @@
             renderItems(sectionItems);
         });
 
-        renderItems(sectionItems); // Initial render
+        // Initial display
+        renderItems(networkingData);
+        
+        // Apply theme from localStorage
+        const currentTheme = localStorage.getItem('theme');
+        if (currentTheme === 'light') {
+            document.documentElement.classList.add('light-theme');
+        }
     </script>
 </body>
 </html>

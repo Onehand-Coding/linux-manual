@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Processing</title>
+    <link rel="stylesheet" href="css/styles.css"/>
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+</head>
+<body>
+    <h1>Text Processing</h1>
+    
+    <div class="search-container">
+        <input type="text" id="search" placeholder="Search commands or patterns...">
+        <select id="category-filter">
+            <option value="all">All Categories</option>
+            <option value="edit">Editing</option>
+            <option value="search">Searching</option>
+            <option value="transform">Transformation</option>
+            <option value="format">Formatting</option>
+            <option value="utility">Utilities</option>
+        </select>
+        <button id="reset">Reset</button>
+    </div>
+    
+    <div class="command-list" id="command-list">
+        <!-- Commands will be populated here by JavaScript -->
+    </div>
+
+    <div class="bottom-back-to-index-container">
+        <a href="../index.html" class="back-to-index-btn">&larr; Back to Main Index</a>
+    </div>
+
+    <footer>
+        Text Processing - Linux Manual
+    </footer>
+
+    <script>
+        // Define Text Processing commands database
+        const textCommands = [
+            {
+                name: "grep",
+                syntax: "grep [options] pattern [file...]",
+                description: "Searches for patterns in files using regular expressions.",
+                examples: "grep 'error' /var/log/syslog\ngrep -r 'function_name' ./src/",
+                level: "basic",
+                category: "search",
+                manLink: "https://man7.org/linux/man-pages/man1/grep.1.html",
+                tags: ["search", "find", "pattern", "regex"]
+            },
+            {
+                name: "sed",
+                syntax: "sed [options] script [input-file...]",
+                description: "A stream editor for filtering and transforming text.",
+                examples: "sed 's/old/new/g' file.txt\ncat file.txt | sed 's/^/#/'",
+                level: "intermediate",
+                category: "transform",
+                manLink: "https://man7.org/linux/man-pages/man1/sed.1.html",
+                tags: ["stream", "edit", "substitute", "transform"]
+            },
+            {
+                name: "awk",
+                syntax: "awk [options] 'program' file...",
+                description: "A powerful programming language for text processing and data extraction.",
+                examples: "awk '{print $1}' file.txt\nawk -F: '{print $1}' /etc/passwd",
+                level: "advanced",
+                category: "transform",
+                manLink: "https://man7.org/linux/man-pages/man1/awk.1.html",
+                tags: ["pattern", "scan", "process", "data"]
+            },
+            {
+                name: "cut",
+                syntax: "cut [options] [file...]",
+                description: "Removes sections from each line of files.",
+                examples: "cut -d: -f1 /etc/passwd\ncut -c1-5 file.txt",
+                level: "basic",
+                category: "transform",
+                manLink: "https://man7.org/linux/man-pages/man1/cut.1.html",
+                tags: ["remove", "section", "field", "column"]
+            },
+            {
+                name: "sort",
+                syntax: "sort [options] [file...]",
+                description: "Sorts lines of text files.",
+                examples: "sort file.txt\nsort -k2 -n data.csv",
+                level: "basic",
+                category: "transform",
+                manLink: "https://man7.org/linux/man-pages/man1/sort.1.html",
+                tags: ["order", "arrange", "lines"]
+            },
+            {
+                name: "uniq",
+                syntax: "uniq [options] [input [output]]",
+                description: "Reports or omits repeated lines.",
+                examples: "uniq file.txt\nsort file.txt | uniq -c",
+                level: "basic",
+                category: "transform",
+                manLink: "https://man7.org/linux/man-pages/man1/uniq.1.html",
+                tags: ["unique", "duplicate", "lines"]
+            },
+            {
+                name: "wc",
+                syntax: "wc [options] [file...]",
+                description: "Prints newline, word, and byte counts for each file.",
+                examples: "wc file.txt\nwc -l *.py",
+                level: "basic",
+                category: "utility",
+                manLink: "https://man7.org/linux/man-pages/man1/wc.1.html",
+                tags: ["word", "count", "lines", "bytes"]
+            },
+            {
+                name: "tr",
+                syntax: "tr [options] SET1 [SET2]",
+                description: "Translates or deletes characters.",
+                examples: "echo 'hello' | tr 'a-z' 'A-Z'\ncat file.txt | tr -d '\\n'",
+                level: "intermediate",
+                category: "transform",
+                manLink: "https://man7.org/linux/man-pages/man1/tr.1.html",
+                tags: ["translate", "delete", "characters", "squeeze"]
+            },
+            {
+                name: "paste",
+                syntax: "paste [options] [file...]",
+                description: "Merges lines of files.",
+                examples: "paste file1.txt file2.txt\npaste -d',' file1.csv file2.csv",
+                level: "intermediate",
+                category: "transform",
+                manLink: "https://man7.org/linux/man-pages/man1/paste.1.html",
+                tags: ["merge", "columns", "files", "parallel"]
+            },
+            {
+                name: "diff",
+                syntax: "diff [options] from-file to-file",
+                description: "Compares files line by line.",
+                examples: "diff file1.txt file2.txt\ndiff -u old.conf new.conf",
+                level: "basic",
+                category: "utility",
+                manLink: "https://man7.org/linux/man-pages/man1/diff.1.html",
+                tags: ["compare", "difference", "files", "patch"]
+            },
+            {
+                name: "patch",
+                syntax: "patch [options] [originalfile [patchfile]]",
+                description: "Apply a diff file to an original.",
+                examples: "patch < changes.patch\npatch file.txt diffs.patch",
+                level: "intermediate",
+                category: "utility",
+                manLink: "https://man7.org/linux/man-pages/man1/patch.1.html",
+                tags: ["apply", "diff", "update", "modify"]
+            },
+            {
+                name: "head",
+                syntax: "head [options] [file...]",
+                description: "Outputs the first part of files.",
+                examples: "head file.txt\nhead -n 20 largefile.log",
+                level: "basic",
+                category: "utility",
+                manLink: "https://man7.org/linux/man-pages/man1/head.1.html",
+                tags: ["first", "lines", "beginning"]
+            },
+            {
+                name: "tail",
+                syntax: "tail [options] [file...]",
+                description: "Outputs the last part of files.",
+                examples: "tail file.txt\ntail -f /var/log/syslog",
+                level: "basic",
+                category: "utility",
+                manLink: "https://man7.org/linux/man-pages/man1/tail.1.html",
+                tags: ["last", "lines", "end", "follow"]
+            },
+            {
+                name: "less",
+                syntax: "less [options] [file...]",
+                description: "Opposite of more. A program similar to more, but which allows backward movement in the file as well as forward movement.",
+                examples: "less file.txt\ncommand | less",
+                level: "basic",
+                category: "utility",
+                manLink: "https://man7.org/linux/man-pages/man1/less.1.html",
+                tags: ["view", "pager", "read", "navigate"]
+            },
+            {
+                name: "cat",
+                syntax: "cat [options] [file...]",
+                description: "Concatenates and prints files.",
+                examples: "cat file1.txt file2.txt\ncat > newfile.txt",
+                level: "basic",
+                category: "utility",
+                manLink: "https://man7.org/linux/man-pages/man1/cat.1.html",
+                tags: ["concatenate", "print", "files"]
+            },
+            {
+                name: "vim",
+                syntax: "vim [options] [file...]",
+                description: "Vi IMproved, a programmer's text editor.",
+                examples: "vim file.txt\nvim -R readonly.txt",
+                level: "intermediate",
+                category: "edit",
+                manLink: "https://man7.org/linux/man-pages/man1/vim.1.html",
+                tags: ["editor", "vi", "modal", "advanced"]
+            },
+            {
+                name: "nano",
+                syntax: "nano [options] [[+line,column] file]...",
+                description: "A simple text editor.",
+                examples: "nano file.txt\nnano +5,10 file.txt",
+                level: "basic",
+                category: "edit",
+                manLink: "https://man7.org/linux/man-pages/man1/nano.1.html",
+                tags: ["editor", "simple", "easy"]
+            }
+        ];
+
+        function displayCommands(commands) {
+            const commandList = document.getElementById('command-list');
+            commandList.innerHTML = '';
+
+            if (commands.length === 0) {
+                commandList.innerHTML = '<div class="no-results">No commands found matching the criteria.</div>';
+                return;
+            }
+
+            commands.forEach(cmd => {
+                const commandCard = document.createElement('div');
+                commandCard.className = 'command-card';
+                
+                const levelClass = cmd.level.toLowerCase();
+                const categoryClass = cmd.category.toLowerCase();
+
+                commandCard.innerHTML = `
+                    <div class="command-name">${cmd.name}</div>
+                    <div class="level ${levelClass}">${cmd.level.charAt(0).toUpperCase() + cmd.level.slice(1)}</div>
+                    <div class="category ${categoryClass}">${cmd.category.charAt(0).toUpperCase() + cmd.category.slice(1)}</div>
+                    <div class="command-syntax">${cmd.syntax}</div>
+                    <div class="command-description">${cmd.description}</div>
+                    <div class="command-example">
+                        <strong>Example:</strong><br>
+                        <code>${cmd.examples.replace(/\n/g, '<br>')}</code>
+                    </div>
+                    <div class="command-tags">
+                        Tags: ${cmd.tags.map(tag => `<span class="tag">${tag}</span>`).join(' ')}
+                    </div>
+                    <div class="learn-more">
+                        <a href="${cmd.manLink}" target="_blank">Learn more (man page)</a>
+                    </div>
+                `;
+                commandList.appendChild(commandCard);
+            });
+        }
+
+        function filterCommands() {
+            const searchTerm = document.getElementById('search').value.toLowerCase();
+            const categoryFilter = document.getElementById('category-filter').value;
+
+            const filteredCommands = textCommands.filter(cmd => {
+                const matchesSearch = cmd.name.toLowerCase().includes(searchTerm) ||
+                                     cmd.description.toLowerCase().includes(searchTerm) ||
+                                     cmd.tags.some(tag => tag.toLowerCase().includes(searchTerm));
+                
+                const matchesCategory = categoryFilter === 'all' || cmd.category === categoryFilter;
+
+                return matchesSearch && matchesCategory;
+            });
+
+            displayCommands(filteredCommands);
+        }
+
+        function resetFilters() {
+            document.getElementById('search').value = '';
+            document.getElementById('category-filter').value = 'all';
+            displayCommands(textCommands);
+        }
+
+        document.getElementById('search').addEventListener('input', filterCommands);
+        document.getElementById('category-filter').addEventListener('change', filterCommands);
+        document.getElementById('reset').addEventListener('click', resetFilters);
+
+        // Initial display
+        displayCommands(textCommands);
+        
+        // Apply theme from localStorage
+        const currentTheme = localStorage.getItem('theme');
+        if (currentTheme === 'light') {
+            document.documentElement.classList.add('light-theme');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtualization & Containers</title>
+    <link rel="stylesheet" href="css/styles.css"/>
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+</head>
+<body>
+    <h1>Virtualization & Containers</h1>
+    
+    <div class="search-container">
+        <input type="text" id="search" placeholder="Search technologies or commands...">
+        <select id="type-filter">
+            <option value="all">All Types</option>
+            <option value="virtualization">Virtualization</option>
+            <option value="containerization">Containerization</option>
+            <option value="orchestration">Orchestration</option>
+        </select>
+        <button id="reset">Reset</button>
+    </div>
+    
+    <div class="command-list" id="tech-list">
+        <!-- Technologies will be populated here by JavaScript -->
+    </div>
+
+    <div class="bottom-back-to-index-container">
+        <a href="../index.html" class="back-to-index-btn">&larr; Back to Main Index</a>
+    </div>
+
+    <footer>
+        Virtualization & Containers - Linux Manual
+    </footer>
+
+    <script>
+        // Define Virtualization & Containers technologies database
+        const virtualizationTechs = [
+            {
+                name: "KVM (Kernel-based Virtual Machine)",
+                syntax: "See libvirt tools like virsh, virt-manager",
+                description: "A full virtualization solution for Linux on x86 hardware containing virtualization extensions.",
+                examples: "virsh list --all\nvirt-manager",
+                level: "advanced",
+                category: "virtualization",
+                manLink: "https://www.linux-kvm.org/",
+                tags: ["kvm", "qemu", "virtualization", "hypervisor"]
+            },
+            {
+                name: "QEMU",
+                syntax: "qemu-system-x86_64 [options] [disk_image]",
+                description: "A generic and open source machine emulator and virtualizer.",
+                examples: "qemu-system-x86_64 -hda disk.img\nqemu-img create -f qcow2 mydisk.qcow2 10G",
+                level: "advanced",
+                category: "virtualization",
+                manLink: "https://www.qemu.org/",
+                tags: ["emulator", "virtualizer", "kvm", "machine"]
+            },
+            {
+                name: "VirtualBox",
+                syntax: "VBoxManage [command] [arguments...]",
+                description: "A powerful x86 and AMD64/Intel64 virtualization product for enterprise as well as home use.",
+                examples: "VBoxManage list vms\nVBoxManage startvm \"My VM\"",
+                level: "intermediate",
+                category: "virtualization",
+                manLink: "https://www.virtualbox.org/",
+                tags: ["oracle", "vm", "desktop", "gui"]
+            },
+            {
+                name: "Docker",
+                syntax: "docker [command] [options]",
+                description: "A set of platform as a service products that use OS-level virtualization to deliver software in packages called containers.",
+                examples: "docker run -it ubuntu:latest\ndocker ps -a\ndocker build -t myapp .",
+                level: "intermediate",
+                category: "containerization",
+                manLink: "https://docs.docker.com/",
+                tags: ["container", "image", "run", "build"]
+            },
+            {
+                name: "Podman",
+                syntax: "podman [command] [options]",
+                description: "A daemonless container engine for developing, managing, and running OCI Containers on your Linux System.",
+                examples: "podman run -it fedora:latest\npodman ps -a\npodman build -t myapp .",
+                level: "intermediate",
+                category: "containerization",
+                manLink: "https://podman.io/",
+                tags: ["container", "daemonless", "oci", "rootless"]
+            },
+            {
+                name: "LXC (Linux Containers)",
+                syntax: "lxc- [command] [options]",
+                description: "An operating-system-level virtualization method for running multiple isolated Linux systems (containers) on a control host using a single Linux kernel.",
+                examples: "lxc-create -n mycontainer -t download\nlxc-start -n mycontainer\nlxc-attach -n mycontainer",
+                level: "advanced",
+                category: "containerization",
+                manLink: "https://linuxcontainers.org/lxc/",
+                tags: ["system", "container", "os-level", "isolation"]
+            },
+            {
+                name: "LXD",
+                syntax: "lxc [command] [options]",
+                description: "A next generation system container manager. It offers a user experience similar to virtual machines but using lightweight containers.",
+                examples: "lxc launch ubuntu:20.04 mycontainer\nlxc list\nlxc exec mycontainer -- bash",
+                level: "advanced",
+                category: "containerization",
+                manLink: "https://linuxcontainers.org/lxd/",
+                tags: ["system", "container", "manager", "restapi"]
+            },
+            {
+                name: "Kubernetes (k8s)",
+                syntax: "kubectl [command] [TYPE] [NAME] [flags]",
+                description: "An open-source system for automating deployment, scaling, and management of containerized applications.",
+                examples: "kubectl get pods\nkubectl apply -f deployment.yaml\nkubectl describe pod mypod",
+                level: "advanced",
+                category: "orchestration",
+                manLink: "https://kubernetes.io/",
+                tags: ["k8s", "cluster", "orchestration", "pods"]
+            },
+            {
+                name: "Docker Compose",
+                syntax: "docker-compose [options] [COMMAND] [ARGS...]",
+                description: "A tool for defining and running multi-container Docker applications.",
+                examples: "docker-compose up -d\ndocker-compose down\ndocker-compose logs",
+                level: "intermediate",
+                category: "orchestration",
+                manLink: "https://docs.docker.com/compose/",
+                tags: ["docker", "multi-container", "yaml", "services"]
+            },
+            {
+                name: "Podman Compose",
+                syntax: "podman-compose [options] [COMMAND] [ARGS...]",
+                description: "A script to run docker-compose.yml using podman.",
+                examples: "podman-compose up -d\npodman-compose down\npodman-compose logs",
+                level: "intermediate",
+                category: "orchestration",
+                manLink: "https://github.com/containers/podman-compose",
+                tags: ["podman", "multi-container", "yaml", "services"]
+            }
+        ];
+
+        function displayTechnologies(techs) {
+            const techList = document.getElementById('tech-list');
+            techList.innerHTML = '';
+
+            if (techs.length === 0) {
+                techList.innerHTML = '<div class="no-results">No technologies found matching the criteria.</div>';
+                return;
+            }
+
+            techs.forEach(tech => {
+                const techCard = document.createElement('div');
+                techCard.className = 'command-card';
+                
+                const levelClass = tech.level.toLowerCase();
+                const categoryClass = tech.category.toLowerCase();
+
+                techCard.innerHTML = `
+                    <div class="command-name">${tech.name}</div>
+                    <div class="level ${levelClass}">${tech.level.charAt(0).toUpperCase() + tech.level.slice(1)}</div>
+                    <div class="category ${categoryClass}">${tech.category.charAt(0).toUpperCase() + tech.category.slice(1)}</div>
+                    <div class="command-syntax">${tech.syntax}</div>
+                    <div class="command-description">${tech.description}</div>
+                    <div class="command-example">
+                        <strong>Example:</strong><br>
+                        <code>${tech.examples.replace(/\n/g, '<br>')}</code>
+                    </div>
+                    <div class="command-tags">
+                        Tags: ${tech.tags.map(tag => `<span class="tag">${tag}</span>`).join(' ')}
+                    </div>
+                    <div class="learn-more">
+                        <a href="${tech.manLink}" target="_blank">Learn more</a>
+                    </div>
+                `;
+                techList.appendChild(techCard);
+            });
+        }
+
+        function filterTechnologies() {
+            const searchTerm = document.getElementById('search').value.toLowerCase();
+            const typeFilter = document.getElementById('type-filter').value;
+
+            const filteredTechs = virtualizationTechs.filter(tech => {
+                const matchesSearch = tech.name.toLowerCase().includes(searchTerm) ||
+                                     tech.description.toLowerCase().includes(searchTerm) ||
+                                     tech.tags.some(tag => tag.toLowerCase().includes(searchTerm));
+                
+                const matchesType = typeFilter === 'all' || tech.category === typeFilter;
+
+                return matchesSearch && matchesType;
+            });
+
+            displayTechnologies(filteredTechs);
+        }
+
+        function resetFilters() {
+            document.getElementById('search').value = '';
+            document.getElementById('type-filter').value = 'all';
+            displayTechnologies(virtualizationTechs);
+        }
+
+        document.getElementById('search').addEventListener('input', filterTechnologies);
+        document.getElementById('type-filter').addEventListener('change', filterTechnologies);
+        document.getElementById('reset').addEventListener('click', resetFilters);
+
+        // Initial display
+        displayTechnologies(virtualizationTechs);
+        
+        // Apply theme from localStorage
+        const currentTheme = localStorage.getItem('theme');
+        if (currentTheme === 'light') {
+            document.documentElement.classList.add('light-theme');
+        }
+    </script>
+</body>
+</html>

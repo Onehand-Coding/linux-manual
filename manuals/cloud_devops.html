@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Linux Manual - Cloud & DevOps</title>
     <link rel="stylesheet" href="css/styles.css"/>
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
 </head>
 <body>
     <h1>Linux Manual - Cloud & DevOps</h1>
@@ -162,7 +163,14 @@
             renderItems(sectionItems);
         });
 
-        renderItems(sectionItems); // Initial render
+        // Initial display
+        renderItems(cloudDevopsData);
+        
+        // Apply theme from localStorage
+        const currentTheme = localStorage.getItem('theme');
+        if (currentTheme === 'light') {
+            document.documentElement.classList.add('light-theme');
+        }
     </script>
 </body>
 </html>
