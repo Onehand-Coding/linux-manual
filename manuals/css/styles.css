@@ -1,3 +1,68 @@
+body {
+            max-width: 900px; /* Slightly narrower for a landing page */
+        }
+        .container {
+            padding: 20px;
+        }
+        .intro {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .intro p {
+            font-size: 1.1em;
+            color: var(--text-secondary);
+        }
+        .manual-sections {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            list-style: none;
+            padding: 0;
+        }
+        .manual-sections li a {
+            display: block;
+            background-color: var(--card-bg);
+            color: var(--primary-color);
+            padding: 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 1.2em;
+            font-weight: bold;
+            transition: background-color 0.2s, transform 0.2s;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+        .manual-sections li a:hover {
+            background-color: var(--hover-color);
+            transform: translateY(-3px);
+            color: var(--secondary-color);
+        }
+        footer {
+            margin-top: 50px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle-container {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .theme-toggle-btn {
+            padding: 8px 16px;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .theme-toggle-btn:hover {
+            background-color: var(--hover-color);
+        }
+
 :root {
             --bg-color: #121212;
             --card-bg: #1e1e1e;
