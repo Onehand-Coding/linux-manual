@@ -480,20 +480,20 @@ body {
     justify-content: center;
     width: 40px;
     height: 40px;
-    background-color: var(--card-bg);
-    color: var(--text-color);
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: #ffffff;
     text-decoration: none;
     border-radius: 50%;
     font-size: 1.2em;
     transition: all 0.2s ease;
-    border: 1px solid var(--border-color);
+    border: none;
     margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(187, 134, 252, 0.3);
 }
 
 .nav-back:hover {
-    background-color: var(--hover-color);
-    color: var(--primary-color);
-    transform: translateX(-3px);
+    transform: scale(1.1) translateX(-3px);
+    box-shadow: 0 4px 15px rgba(187, 134, 252, 0.5);
 }
 
 .nav-back svg {
