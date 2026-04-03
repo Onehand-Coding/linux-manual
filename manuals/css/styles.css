@@ -43,25 +43,57 @@ body {
             padding-top: 20px;
         }
 
-        /* Theme Toggle Button */
-        .theme-toggle-container {
-            text-align: right;
-            margin-bottom: 20px;
-        }
+/* Theme Toggle Button */
+.theme-toggle-container {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    z-index: 100;
+}
 
-        .theme-toggle-btn {
-            padding: 8px 16px;
-            background-color: var(--card-bg);
-            color: var(--text-color);
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.9em;
-        }
+.theme-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: #ffffff;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(187, 134, 252, 0.3);
+}
 
-        .theme-toggle-btn:hover {
-            background-color: var(--hover-color);
-        }
+.theme-toggle-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 15px rgba(187, 134, 252, 0.5);
+}
+
+.theme-toggle-btn svg {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+}
+
+.theme-toggle-btn .sun-icon,
+.theme-toggle-btn .moon-icon {
+    display: none;
+}
+
+:root.light-theme .theme-toggle-btn .sun-icon {
+    display: block;
+}
+
+:root.light-theme .theme-toggle-btn .moon-icon {
+    display: block;
+    stroke: #000000;
+}
+
+:root:not(.light-theme) .theme-toggle-btn .moon-icon {
+    display: block;
+}
 
 :root {
             --bg-color: #121212;
@@ -441,29 +473,30 @@ body {
         }
 
 
-        /* Container for the 'Back to Index' button at the bottom */
-.bottom-back-to-index-container {
-    text-align: center; /* Centers the button */
-    margin-top: 40px;   /* Space above the button */
-    margin-bottom: 20px;/* Space below the button, before the footer */
-    padding-top: 20px;  /* Optional: add some padding if you want a separator line */
-    border-top: 1px solid var(--border-color); /* Optional: visual separator line */
+        /* Top navigation button */
+.nav-back {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    text-decoration: none;
+    border-radius: 50%;
+    font-size: 1.2em;
+    transition: all 0.2s ease;
+    border: 1px solid var(--border-color);
+    margin-bottom: 15px;
 }
 
-/* Styling for the 'Back to Index' button itself (if not already in styles.css) */
-/* You can reuse or adapt the .back-to-index-btn style I provided earlier */
-.back-to-index-btn { /* Renaming to avoid conflict if you had a top one, or keep if it's the same style */
-    display: inline-block;
-    padding: 12px 25px; /* Slightly larger for a bottom button */
-    background-color: var(--primary-dark); /* Consistent with other buttons */
-    color: white;
-    text-decoration: none;
-    border-radius: 4px;
-    font-size: 1em; /* Slightly larger */
-    font-weight: bold;
-    transition: background-color 0.2s, color 0.2s;
-    border: none; /* Consistent with other buttons */
+.nav-back:hover {
+    background-color: var(--hover-color);
+    color: var(--primary-color);
+    transform: translateX(-3px);
 }
-.back-to-index-btn:hover {
-    background-color: var(--primary-color);
+
+.nav-back svg {
+    width: 20px;
+    height: 20px;
 }

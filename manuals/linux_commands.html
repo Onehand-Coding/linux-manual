@@ -8,6 +8,30 @@
     <link rel="icon" type="image/x-icon" href="../favicon.ico">
 </head>
 <body>
+
+    <div class="theme-toggle-container">
+        <button class="theme-toggle-btn" id="themeToggle" title="Toggle Theme">
+            <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+        </button>
+    </div>
+    <a href="../index.html" class="nav-back" title="Back to Index">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+    </a>
     <h1>Linux Command Reference Tool</h1>
     
     <div class="search-container">
@@ -38,10 +62,6 @@
     
     <div class="command-list" id="command-list">
         <!-- Commands will be populated here by JavaScript -->
-    </div>
-
-    <div class="bottom-back-to-index-container">
-        <a href="../index.html" class="back-to-index-btn">&larr; Back to Main Index</a>
     </div>
 
     <footer>
@@ -273,6 +293,76 @@
                 category: "compression",
                 manLink: "https://man7.org/linux/man-pages/man1/gzip.1.html",
                 tags: ["compress", "decompress", "archive"]
+            },
+            {
+                name: "zip",
+                syntax: "zip [options] archive file(s)",
+                description: "Packages and compresses files into a ZIP archive.",
+                examples: "zip archive.zip file1 file2\nzip -r archive.zip directory/\nzip -9 archive.zip file.txt # max compression",
+                level: "basic",
+                category: "compression",
+                manLink: "https://linux.die.net/man/1/zip",
+                tags: ["compress", "archive", "zip", "unzip"]
+            },
+            {
+                name: "unzip",
+                syntax: "unzip [options] archive",
+                description: "Extracts files from a ZIP archive.",
+                examples: "unzip archive.zip\nunzip archive.zip -d /destination/\nunzip -l archive.zip # list contents",
+                level: "basic",
+                category: "compression",
+                manLink: "https://linux.die.net/man/1/unzip",
+                tags: ["extract", "unzip", "archive"]
+            },
+            {
+                name: "bzip2",
+                syntax: "bzip2 [options] file(s)",
+                description: "Compresses files using the Burrows-Wheeler algorithm (better compression than gzip).",
+                examples: "bzip2 file.txt\nbzip2 -k file.txt # keep original\nbzip2 -d file.txt.bz2",
+                level: "basic",
+                category: "compression",
+                manLink: "https://man7.org/linux/man-pages/man1/bzip2.1.html",
+                tags: ["compress", "bzip2", "bunzip2"]
+            },
+            {
+                name: "xz",
+                syntax: "xz [options] file(s)",
+                description: "Compresses files using LZMA algorithm (high compression ratio).",
+                examples: "xz file.txt\nxz -k file.txt # keep original\nxz -9 file.txt # max compression\nxz -d file.txt.xz",
+                level: "basic",
+                category: "compression",
+                manLink: "https://man7.org/linux/man-pages/man1/xz.1.html",
+                tags: ["compress", "xz", "unxz", "lzma"]
+            },
+            {
+                name: "7z",
+                syntax: "7z [command] [options] archive",
+                description: "7-Zip file archiver with high compression ratio.",
+                examples: "7z a archive.7z file.txt # create\n7z x archive.7z # extract\n7z l archive.7z # list\n7z a -mx=9 archive.7z file # max compression",
+                level: "intermediate",
+                category: "compression",
+                manLink: "https://linux.die.net/man/1/7z",
+                tags: ["compress", "7z", "7zip", "archive"]
+            },
+            {
+                name: "zcat",
+                syntax: "zcat [options] file(.gz)",
+                description: "Displays contents of compressed files without extracting.",
+                examples: "zcat file.gz\nzcat file.gz | head\ngunzip -c file.gz",
+                level: "basic",
+                category: "compression",
+                manLink: "https://man7.org/linux/man-pages/man1/zcat.1.html",
+                tags: ["view", "compress", "gzip", "pipe"]
+            },
+            {
+                name: "pigz",
+                syntax: "pigz [options] file",
+                description: "Parallel implementation of gzip for faster compression on multi-core systems.",
+                examples: "pigz file.txt\npigz -p 8 file.txt # use 8 cores\npigz -d file.txt.gz",
+                level: "intermediate",
+                category: "compression",
+                manLink: "https://zlib.net/pigz/pigz.html",
+                tags: ["compress", "parallel", "gzip", "multi-core"]
             },
             {
                 name: "df",
@@ -608,11 +698,16 @@
         // Initial display
         renderCommands(linuxCommands);
         
-        // Apply theme from localStorage
-        const currentTheme = localStorage.getItem('theme');
-        if (currentTheme === 'light') {
-            document.documentElement.classList.add('light-theme');
-        }
+        // Apply theme from localStorage or system preference
+        const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.classList.toggle('light-theme', currentTheme === 'light');
+
+        // Theme toggle functionality
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            const isLightTheme = document.documentElement.classList.toggle('light-theme');
+            const newTheme = isLightTheme ? 'light' : 'dark';
+            localStorage.setItem('theme', newTheme);
+        });
     </script>
 </body>
 </html>

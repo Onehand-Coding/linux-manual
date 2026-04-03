@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux Manual - File Sharing</title>
+    <link rel="stylesheet" href="css/styles.css"/>
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+</head>
+<body>
+
+    <div class="theme-toggle-container">
+        <button class="theme-toggle-btn" id="themeToggle" title="Toggle Theme">
+            <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+        </button>
+    </div>
+    <a href="../index.html" class="nav-back" title="Back to Index">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+    </a>
+    <h1>File Sharing (Samba & NFS)</h1>
+    
+    <div class="search-container">
+        <input type="text" id="search" placeholder="Search file sharing topics...">
+        <select id="category-filter">
+            <option value="all">All Categories</option>
+            <option value="samba">Samba</option>
+            <option value="nfs">NFS</option>
+            <option value="tools">Tools</option>
+        </select>
+        <button id="reset">Reset</button>
+    </div>
+    
+    <div class="command-list" id="content-list">
+    </div>
+
+    <footer>
+        File Sharing - Linux Manual
+    </footer>
+
+    <script>
+        const sharingData = [
+            // Samba
+            {
+                name: "smbclient",
+                syntax: "smbclient [options] //server/share",
+                description: "SMB client to access Windows/Samba shares.",
+                examples: "smbclient //server/share -U username\nsmbclient //server/share -c 'ls'\nsmbclient //server/share -c 'put localfile'",
+                level: "intermediate",
+                category: "samba",
+                tags: ["samba", "smb", "client", "windows"]
+            },
+            {
+                name: "smbpasswd",
+                syntax: "smbpasswd [options] username",
+                description: "Manages Samba user passwords.",
+                examples: "smbpasswd -a username # add user\nsmbpasswd -e username # enable user\nsmbpasswd -d username # disable user\nsmbpasswd -x username # delete user",
+                level: "intermediate",
+                category: "samba",
+                tags: ["samba", "password", "user", "smb"]
+            },
+            {
+                name: "testparm",
+                syntax: "testparm [options]",
+                description: "Checks Samba configuration file syntax.",
+                examples: "testparm\ntestparm -s smb.conf\ntestparm -v smb.conf",
+                level: "intermediate",
+                category: "samba",
+                tags: ["samba", "config", "check"]
+            },
+            {
+                name: "smbstatus",
+                syntax: "smbstatus [options]",
+                description: "Shows current Samba connections.",
+                examples: "smbstatus\nsmbstatus -b # brief\nsmbstatus -S # shares\nsmbstatus -p # processes",
+                level: "intermediate",
+                category: "samba",
+                tags: ["samba", "status", "connections"]
+            },
+            {
+                name: "nmblookup",
+                syntax: "nmblookup [options] name",
+                description: "NetBIOS name lookup tool for Samba.",
+                examples: "nmblookup -U workgroup\nnmblookup -S 192.168.1.1\nnmblookup -A 192.168.1.1",
+                level: "intermediate",
+                category: "samba",
+                tags: ["samba", "netbios", "lookup"]
+            },
+            {
+                name: "mount.cifs",
+                syntax: "mount.cifs //server/share mountpoint [options]",
+                description: "Mounts SMB/CIFS shares.",
+                examples: "mount.cifs //server/share /mnt -o user=username\nmount.cifs //server/share /mnt -o user=username,password=pass\nmount.cifs //server/share /mnt -o vers=3.0",
+                level: "intermediate",
+                category: "samba",
+                tags: ["mount", "cifs", "smb", "share"]
+            },
+            // NFS
+            {
+                name: "showmount",
+                syntax: "showmount [options] host",
+                description: "Shows NFS server export information.",
+                examples: "showmount -e server\nshowmount -e 192.168.1.1\nshowmount -d server # directories",
+                level: "basic",
+                category: "nfs",
+                tags: ["nfs", "showmount", "exports"]
+            },
+            {
+                name: "exportfs",
+                syntax: "exportfs [options]",
+                description: "Manages NFS exports table.",
+                examples: "exportfs -a # export all\nexportfs -r # reexport\nexportfs -u # unexport\nexportfs -v # verbose",
+                level: "intermediate",
+                category: "nfs",
+                tags: ["nfs", "export", "exports"]
+            },
+            {
+                name: "mount.nfs",
+                syntax: "mount.nfs server:/path mountpoint [options]",
+                description: "Mounts NFS shares.",
+                examples: "mount.nfs server:/shared /mnt/nfs\nmount.nfs -v server:/shared /mnt\nmount.nfs -o rw,soft server:/shared /mnt",
+                level: "intermediate",
+                category: "nfs",
+                tags: ["mount", "nfs", "share"]
+            },
+            {
+                name: "nfsstat",
+                syntax: "nfsstat [options]",
+                description: "Displays NFS statistics.",
+                examples: "nfsstat\nnfsstat -c # client\nnfsstat -s # server\nnfsstat -n # NFS only\nnfsstat -m # mounted filesystems",
+                level: "intermediate",
+                category: "nfs",
+                tags: ["nfs", "stats", "statistics"]
+            },
+            {
+                name: "rpcinfo",
+                syntax: "rpcinfo [options]",
+                description: "Reports RPC information.",
+                examples: "rpcinfo -p\nrpcinfo -p server\nrpcinfo -u server mountd\nrpcinfo -t server nfs",
+                level: "intermediate",
+                category: "nfs",
+                tags: ["rpc", "nfs", "info"]
+            },
+            // Tools
+            {
+                name: "netstat",
+                syntax: "netstat [options]",
+                description: "Shows network connections (includes SMB/NFS).",
+                examples: "netstat -an | grep :445\nnetstat -an | grep :2049\nnetstat -tulpn | grep nfs",
+                level: "basic",
+                category: "tools",
+                tags: ["netstat", "network", "ports"]
+            },
+            {
+                name: "ss",
+                syntax: "ss [options]",
+                description: "Socket statistics (modern replacement for netstat).",
+                examples: "ss -tunap | grep :445\nss -tunap | grep nfs\nss -tuna | grep -E '445|2049'",
+                level: "basic",
+                category: "tools",
+                tags: ["ss", "socket", "network"]
+            }
+        ];
+
+        function renderContent(items) {
+            const container = document.getElementById('content-list');
+            container.innerHTML = '';
+            
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'command-card';
+                card.innerHTML = `
+                    <div class="command-name">${item.name}</div>
+                    <div class="command-tags">
+                        <span class="level ${item.level}">${item.level}</span>
+                        <span class="category">${item.category}</span>
+                    </div>
+                    <div class="command-syntax">${item.syntax}</div>
+                    <div class="command-description">${item.description}</div>
+                    <div class="command-example"><strong>Example:</strong><br>${item.examples.replace(/\n/g, '<br>')}</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function filterContent() {
+            const search = document.getElementById('search').value.toLowerCase();
+            const category = document.getElementById('category-filter').value;
+            
+            const filtered = sharingData.filter(item => {
+                const matchSearch = item.name.toLowerCase().includes(search) || 
+                    item.description.toLowerCase().includes(search) ||
+                    item.tags.some(tag => tag.includes(search));
+                const matchCategory = category === 'all' || item.category === category;
+                return matchSearch && matchCategory;
+            });
+            
+            renderContent(filtered);
+        }
+
+        document.getElementById('search').addEventListener('input', filterContent);
+        document.getElementById('category-filter').addEventListener('change', filterContent);
+        document.getElementById('reset').addEventListener('click', () => {
+            document.getElementById('search').value = '';
+            document.getElementById('category-filter').value = 'all';
+            renderContent(sharingData);
+        });
+
+        renderContent(sharingData);
+
+        // Apply theme from localStorage or system preference
+        const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.classList.toggle('light-theme', currentTheme === 'light');
+
+        // Theme toggle functionality
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            const isLightTheme = document.documentElement.classList.toggle('light-theme');
+            const newTheme = isLightTheme ? 'light' : 'dark';
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

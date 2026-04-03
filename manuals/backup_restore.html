@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux Manual - Backup & Restore</title>
+    <link rel="stylesheet" href="css/styles.css"/>
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+</head>
+<body>
+
+    <div class="theme-toggle-container">
+        <button class="theme-toggle-btn" id="themeToggle" title="Toggle Theme">
+            <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+        </button>
+    </div>
+    <a href="../index.html" class="nav-back" title="Back to Index">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+    </a>
+    <h1>Backup & Restore</h1>
+    
+    <div class="search-container">
+        <input type="text" id="search" placeholder="Search backup topics...">
+        <select id="category-filter">
+            <option value="all">All Categories</option>
+            <option value="rsync">rsync</option>
+            <option value="tar">tar/gzip</option>
+            <option value="tools">Backup Tools</option>
+        </select>
+        <button id="reset">Reset</button>
+    </div>
+    
+    <div class="command-list" id="content-list">
+    </div>
+
+    <footer>
+        Backup & Restore - Linux Manual
+    </footer>
+
+    <script>
+        const backupData = [
+            // rsync
+            {
+                name: "rsync",
+                syntax: "rsync [options] source destination",
+                description: "Fast, versatile file copying tool for syncing files locally and remotely.",
+                examples: "rsync -avz source/ dest/\nrsync -avz --delete source/ dest/\nrsync -avz -e ssh user@host:/remote/path /local/path\nrsync -avz --exclude='*.log' source/ dest/",
+                level: "intermediate",
+                category: "rsync",
+                tags: ["rsync", "sync", "backup", "copy", "transfer"]
+            },
+            {
+                name: "rsync with progress",
+                syntax: "rsync -avz --progress source dest",
+                description: "Copy files with progress indicator.",
+                examples: "rsync -avz --progress /home/user/ /backup/user/\nrsync -avzP source/ dest/",
+                level: "intermediate",
+                category: "rsync",
+                tags: ["rsync", "progress", "backup"]
+            },
+            {
+                name: "rsync over SSH",
+                syntax: "rsync [options] -e ssh source user@host:path",
+                description: "Sync files over SSH connection.",
+                examples: "rsync -avz -e ssh /local/ user@server:/remote/\nrsync -avz -e 'ssh -p 2222' source/ user@host:/path/",
+                level: "intermediate",
+                category: "rsync",
+                tags: ["rsync", "ssh", "remote", "sync"]
+            },
+            {
+                name: "rsync daemon",
+                syntax: "rsync [options] user@host::module /local",
+                description: "Sync using rsync daemon mode.",
+                examples: "rsync -av user@server::share /local/backup\nrsync -av --list-only user@server::share",
+                level: "advanced",
+                category: "rsync",
+                tags: ["rsync", "daemon", "module"]
+            },
+            // tar/gzip
+            {
+                name: "tar",
+                syntax: "tar [options] [archive] [files]",
+                description: "Archives files into tarball, with optional compression.",
+                examples: "tar -cvf archive.tar files/\ntar -czvf archive.tar.gz files/\ntar -xzvf archive.tar.gz\ntar -czvf backup.tar.gz --absolute-names /home/",
+                level: "intermediate",
+                category: "tar",
+                tags: ["tar", "archive", "compress", "backup"]
+            },
+            {
+                name: "tar exclude patterns",
+                syntax: "tar [options] --exclude='pattern'",
+                description: "Create archive excluding specific patterns.",
+                examples: "tar -czvf backup.tar.gz --exclude='*.log' --exclude='*.tmp' /home/\ntar -czvf archive.tar.gz --exclude='.git' project/",
+                level: "intermediate",
+                category: "tar",
+                tags: ["tar", "exclude", "archive"]
+            },
+            {
+                name: "tar incremental backup",
+                syntax: "tar -g snapshot -czvf backup.tar.gz files/",
+                description: "Create incremental backup using snapshot file.",
+                examples: "tar -g /var/backup/snapshot -czvf backup1.tar.gz /data/\ntar -g /var/backup/snapshot -czvf backup2.tar.gz /data/",
+                level: "advanced",
+                category: "tar",
+                tags: ["tar", "incremental", "backup", "snapshot"]
+            },
+            {
+                name: "gzip",
+                syntax: "gzip [options] file",
+                description: "Compress files using gzip algorithm.",
+                examples: "gzip file.txt\ngzip -k file.txt # keep original\ngzip -9 file.txt # max compression\ngzip -d file.txt.gz",
+                level: "basic",
+                category: "tar",
+                tags: ["gzip", "compress", "gunzip"]
+            },
+            {
+                name: "bzip2",
+                syntax: "bzip2 [options] file",
+                description: "Compress files using bzip2 (better compression than gzip).",
+                examples: "bzip2 file.txt\nbzip2 -k file.txt\nbzip2 -d file.txt.bz2",
+                level: "basic",
+                category: "tar",
+                tags: ["bzip2", "compress", "bunzip2"]
+            },
+            {
+                name: "xz",
+                syntax: "xz [options] file",
+                description: "Compress files using xz (high compression).",
+                examples: "xz file.txt\nxz -k file.txt\nxz -d file.txt.xz",
+                level: "basic",
+                category: "tar",
+                tags: ["xz", "compress", "unxz"]
+            },
+            // Backup Tools
+            {
+                name: "dd",
+                syntax: "dd if=source of=destination [options]",
+                description: "Converts and copies files, commonly used for disk imaging.",
+                examples: "dd if=/dev/sda of=/backup/sda.img bs=4M\ndd if=/dev/zero of=/dev/null bs=1M count=100 # test speed\ndd if=/dev/sda | gzip > backup.img.gz",
+                level: "advanced",
+                category: "tools",
+                tags: ["dd", "disk", "image", "clone"]
+            },
+            {
+                name: "nc",
+                syntax: "nc [options] host port",
+                description: "Netcat - used for network backup streams.",
+                examples: "# On destination:\nnc -l 9000 | gunzip > backup.img\n# On source:\ndd if=/dev/sda | gzip | nc destination 9000",
+                level: "advanced",
+                category: "tools",
+                tags: ["nc", "netcat", "network", "stream"]
+            },
+            {
+                name: "rsnapshot",
+                syntax: "rsnapshot [command]",
+                description: "Local and remote filesystem backup tool using rsync.",
+                examples: "rsnapshot daily\nrsnapshot weekly\nrsnapshot list\nrsnapshot configtest",
+                level: "advanced",
+                category: "tools",
+                tags: ["rsnapshot", "backup", "snapshot", "sync"]
+            },
+            {
+                name: "duplicity",
+                syntax: "duplicity [options] source dest",
+                description: "Encrypted backup to local or remote storage.",
+                examples: "duplicity /home file:///backup/\nduplicity /home rsync://user@host//backup/\nduplicity --encrypt-key KEY /home rsync://user@host//backup/",
+                level: "advanced",
+                category: "tools",
+                tags: ["duplicity", "backup", "encryption", "incremental"]
+            },
+            {
+                name: "borg",
+                syntax: "borg [command] [options]",
+                description: "Deduplicating backup program with compression and encryption.",
+                examples: "borg create /backup::archive /data\nborg list /backup\nborg extract /backup::archive\nborg mount /backup::archive /mnt",
+                level: "advanced",
+                category: "tools",
+                tags: ["borg", "backup", "deduplication", "encrypted"]
+            }
+        ];
+
+        function renderContent(items) {
+            const container = document.getElementById('content-list');
+            container.innerHTML = '';
+            
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'command-card';
+                card.innerHTML = `
+                    <div class="command-name">${item.name}</div>
+                    <div class="command-tags">
+                        <span class="level ${item.level}">${item.level}</span>
+                        <span class="category">${item.category}</span>
+                    </div>
+                    <div class="command-syntax">${item.syntax}</div>
+                    <div class="command-description">${item.description}</div>
+                    <div class="command-example"><strong>Example:</strong><br>${item.examples.replace(/\n/g, '<br>')}</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function filterContent() {
+            const search = document.getElementById('search').value.toLowerCase();
+            const category = document.getElementById('category-filter').value;
+            
+            const filtered = backupData.filter(item => {
+                const matchSearch = item.name.toLowerCase().includes(search) || 
+                    item.description.toLowerCase().includes(search) ||
+                    item.tags.some(tag => tag.includes(search));
+                const matchCategory = category === 'all' || item.category === category;
+                return matchSearch && matchCategory;
+            });
+            
+            renderContent(filtered);
+        }
+
+        document.getElementById('search').addEventListener('input', filterContent);
+        document.getElementById('category-filter').addEventListener('change', filterContent);
+        document.getElementById('reset').addEventListener('click', () => {
+            document.getElementById('search').value = '';
+            document.getElementById('category-filter').value = 'all';
+            renderContent(backupData);
+        });
+
+        renderContent(backupData);
+
+        // Apply theme from localStorage or system preference
+        const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.classList.toggle('light-theme', currentTheme === 'light');
+
+        // Theme toggle functionality
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            const isLightTheme = document.documentElement.classList.toggle('light-theme');
+            const newTheme = isLightTheme ? 'light' : 'dark';
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

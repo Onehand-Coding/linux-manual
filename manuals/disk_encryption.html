@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux Manual - Disk Encryption</title>
+    <link rel="stylesheet" href="css/styles.css"/>
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+</head>
+<body>
+
+    <div class="theme-toggle-container">
+        <button class="theme-toggle-btn" id="themeToggle" title="Toggle Theme">
+            <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+        </button>
+    </div>
+    <a href="../index.html" class="nav-back" title="Back to Index">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+    </a>
+    <h1>Disk Encryption (LUKS)</h1>
+    
+    <div class="search-container">
+        <input type="text" id="search" placeholder="Search encryption topics...">
+        <select id="category-filter">
+            <option value="all">All Categories</option>
+            <option value="luks">LUKS</option>
+            <option value="dm-crypt">dm-crypt</option>
+            <option value="tools">Tools</option>
+        </select>
+        <button id="reset">Reset</button>
+    </div>
+    
+    <div class="command-list" id="content-list">
+    </div>
+
+    <footer>
+        Disk Encryption - Linux Manual
+    </footer>
+
+    <script>
+        const encryptData = [
+            // LUKS
+            {
+                name: "cryptsetup luksFormat",
+                syntax: "cryptsetup luksFormat [options] device",
+                description: "Formats a device as LUKS encrypted container.",
+                examples: "sudo cryptsetup luksFormat /dev/sdb1\nsudo cryptsetup luksFormat --type luks2 /dev/sdb1\nsudo cryptsetup luksFormat --cipher aes-xts-plain64 /dev/sdb1",
+                level: "advanced",
+                category: "luks",
+                tags: ["luks", "encrypt", "format", "container"]
+            },
+            {
+                name: "cryptsetup luksOpen",
+                syntax: "cryptsetup luksOpen device name",
+                description: "Opens a LUKS container and maps it to a device name.",
+                examples: "sudo cryptsetup luksOpen /dev/sdb1 myvolume\n# Creates /dev/mapper/myvolume",
+                level: "intermediate",
+                category: "luks",
+                tags: ["luks", "open", "unlock", "mapper"]
+            },
+            {
+                name: "cryptsetup luksClose",
+                syntax: "cryptsetup luksClose name",
+                description: "Closes a LUKS container.",
+                examples: "sudo cryptsetup luksClose myvolume\nsudo cryptsetup luksClose /dev/mapper/myvolume",
+                level: "intermediate",
+                category: "luks",
+                tags: ["luks", "close", "lock"]
+            },
+            {
+                name: "cryptsetup luksAddKey",
+                syntax: "cryptsetup luksAddKey device",
+                description: "Adds a new key to a LUKS container.",
+                examples: "sudo cryptsetup luksAddKey /dev/sdb1\nsudo cryptsetup luksAddKey --key-slot 1 /dev/sdb1",
+                level: "intermediate",
+                category: "luks",
+                tags: ["luks", "key", "add", "password"]
+            },
+            {
+                name: "cryptsetup luksRemoveKey",
+                syntax: "cryptsetup luksRemoveKey device",
+                description: "Removes a key from a LUKS container.",
+                examples: "sudo cryptsetup luksRemoveKey /dev/sdb1",
+                level: "intermediate",
+                category: "luks",
+                tags: ["luks", "key", "remove"]
+            },
+            {
+                name: "cryptsetup luksDump",
+                syntax: "cryptsetup luksDump device",
+                description: "Dumps LUKS header information.",
+                examples: "sudo cryptsetup luksDump /dev/sdb1\nsudo cryptsetup luksDump /dev/sdb1 | grep -A5 'Key Slots'",
+                level: "intermediate",
+                category: "luks",
+                tags: ["luks", "dump", "header", "info"]
+            },
+            {
+                name: "cryptsetup luksChangeKey",
+                syntax: "cryptsetup luksChangeKey device",
+                description: "Changes the passphrase for a key slot.",
+                examples: "sudo cryptsetup luksChangeKey /dev/sdb1\nsudo cryptsetup luksChangeKey --key-slot 1 /dev/sdb1",
+                level: "intermediate",
+                category: "luks",
+                tags: ["luks", "key", "change", "passphrase"]
+            },
+            {
+                name: "cryptsetup luksHeaderBackup",
+                syntax: "cryptsetup luksHeaderBackup device --header-backup-file file",
+                description: "Backs up LUKS header (crucial for recovery).",
+                examples: "sudo cryptsetup luksHeaderBackup /dev/sdb1 --header-backup-file luks-header.backup",
+                level: "advanced",
+                category: "luks",
+                tags: ["luks", "header", "backup", "restore"]
+            },
+            {
+                name: "cryptsetup luksHeaderRestore",
+                syntax: "cryptsetup luksHeaderRestore device --header-backup-file file",
+                description: "Restores LUKS header from backup.",
+                examples: "sudo cryptsetup luksHeaderRestore /dev/sdb1 --header-backup-file luks-header.backup",
+                level: "advanced",
+                category: "luks",
+                tags: ["luks", "header", "restore", "backup"]
+            },
+            // dm-crypt
+            {
+                name: "cryptsetup create",
+                syntax: "cryptsetup create name device",
+                description: "Creates a plain dm-crypt device (no LUKS header).",
+                examples: "sudo cryptsetup create encrypted /dev/sdb1\nsudo cryptsetup create -c aes-xts-plain64 encrypted /dev/sdb1",
+                level: "advanced",
+                category: "dm-crypt",
+                tags: ["dm-crypt", "plain", "encrypt"]
+            },
+            {
+                name: "cryptsetup remove",
+                syntax: "cryptsetup remove name",
+                description: "Removes a dm-crypt mapping.",
+                examples: "sudo cryptsetup remove encrypted",
+                level: "intermediate",
+                category: "dm-crypt",
+                tags: ["dm-crypt", "remove", "close"]
+            },
+            {
+                name: "cryptsetup status",
+                syntax: "cryptsetup status name",
+                description: "Shows status of a mapped device.",
+                examples: "sudo cryptsetup status myvolume\nsudo cryptsetup status encrypted",
+                level: "basic",
+                category: "dm-crypt",
+                tags: ["dm-crypt", "status", "info"]
+            },
+            {
+                name: "cryptsetup resize",
+                syntax: "cryptsetup resize name",
+                description: "Resizes an active encrypted device.",
+                examples: "sudo cryptsetup resize myvolume",
+                level: "intermediate",
+                category: "dm-crypt",
+                tags: ["dm-crypt", "resize", "resize2fs"]
+            },
+            // Tools
+            {
+                name: "ls /dev/mapper",
+                syntax: "ls /dev/mapper",
+                description: "Lists active dm-crypt/LUKS mappings.",
+                examples: "ls /dev/mapper\nls -la /dev/mapper/",
+                level: "basic",
+                category: "tools",
+                tags: ["mapper", "device", "luks"]
+            },
+            {
+                name: "cryptsetup isLuks",
+                syntax: "cryptsetup isLuks device",
+                description: "Checks if device is a LUKS container.",
+                examples: "cryptsetup isLuks /dev/sdb1 && echo 'LUKS' || echo 'Not LUKS'",
+                level: "basic",
+                category: "tools",
+                tags: ["luks", "check", "verify"]
+            },
+            {
+                name: "cryptsetup luksUUID",
+                syntax: "cryptsetup luksUUID device",
+                description: "Shows or changes LUKS UUID.",
+                examples: "sudo cryptsetup luksUUID /dev/sdb1\nsudo cryptsetup luksUUID --uuid new-uuid /dev/sdb1",
+                level: "intermediate",
+                category: "tools",
+                tags: ["luks", "uuid", "id"]
+            },
+            {
+                name: "cryptsetup benchmark",
+                syntax: "cryptsetup benchmark",
+                description: "Benchmarks available encryption algorithms.",
+                examples: "sudo cryptsetup benchmark",
+                level: "intermediate",
+                category: "tools",
+                tags: ["cryptsetup", "benchmark", "performance", "cipher"]
+            }
+        ];
+
+        function renderContent(items) {
+            const container = document.getElementById('content-list');
+            container.innerHTML = '';
+            
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'command-card';
+                card.innerHTML = `
+                    <div class="command-name">${item.name}</div>
+                    <div class="command-tags">
+                        <span class="level ${item.level}">${item.level}</span>
+                        <span class="category">${item.category}</span>
+                    </div>
+                    <div class="command-syntax">${item.syntax}</div>
+                    <div class="command-description">${item.description}</div>
+                    <div class="command-example"><strong>Example:</strong><br>${item.examples.replace(/\n/g, '<br>')}</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function filterContent() {
+            const search = document.getElementById('search').value.toLowerCase();
+            const category = document.getElementById('category-filter').value;
+            
+            const filtered = encryptData.filter(item => {
+                const matchSearch = item.name.toLowerCase().includes(search) || 
+                    item.description.toLowerCase().includes(search) ||
+                    item.tags.some(tag => tag.includes(search));
+                const matchCategory = category === 'all' || item.category === category;
+                return matchSearch && matchCategory;
+            });
+            
+            renderContent(filtered);
+        }
+
+        document.getElementById('search').addEventListener('input', filterContent);
+        document.getElementById('category-filter').addEventListener('change', filterContent);
+        document.getElementById('reset').addEventListener('click', () => {
+            document.getElementById('search').value = '';
+            document.getElementById('category-filter').value = 'all';
+            renderContent(encryptData);
+        });
+
+        renderContent(encryptData);
+
+        // Apply theme from localStorage or system preference
+        const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.classList.toggle('light-theme', currentTheme === 'light');
+
+        // Theme toggle functionality
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            const isLightTheme = document.documentElement.classList.toggle('light-theme');
+            const newTheme = isLightTheme ? 'light' : 'dark';
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

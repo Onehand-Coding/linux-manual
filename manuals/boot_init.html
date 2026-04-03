@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux Manual - Boot & Init</title>
+    <link rel="stylesheet" href="css/styles.css"/>
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+</head>
+<body>
+
+    <div class="theme-toggle-container">
+        <button class="theme-toggle-btn" id="themeToggle" title="Toggle Theme">
+            <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+        </button>
+    </div>
+    <a href="../index.html" class="nav-back" title="Back to Index">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+    </a>
+    
+    <h1>Boot & Initialization</h1>
+    
+    <div class="search-container">
+        <input type="text" id="search" placeholder="Search boot topics...">
+        <select id="category-filter">
+            <option value="all">All Categories</option>
+            <option value="grub">GRUB</option>
+            <option value="systemd">systemd</option>
+            <option value="runlevels">Runlevels</option>
+        </select>
+        <button id="reset">Reset</button>
+    </div>
+    
+    <div class="command-list" id="content-list">
+    </div>
+
+    <footer>
+        Boot & Init - Linux Manual
+    </footer>
+
+    <script>
+        const bootData = [
+            // GRUB
+            {
+                name: "update-grub",
+                syntax: "update-grub",
+                description: "Generates GRUB menu config from /etc/default/grub and /etc/grub.d/",
+                examples: "sudo update-grub\n# Or on RHEL-based: grub2-mkconfig -o /boot/grub2/grub.cfg",
+                level: "intermediate",
+                category: "grub",
+                tags: ["grub", "boot", "bootloader", "menu"]
+            },
+            {
+                name: "grub-install",
+                syntax: "grub-install [options] device",
+                description: "Installs GRUB bootloader to the specified device.",
+                examples: "sudo grub-install /dev/sda\nsudo grub-install --root-directory=/boot /dev/sda",
+                level: "advanced",
+                category: "grub",
+                tags: ["grub", "bootloader", "install", "mbr"]
+            },
+            {
+                name: "grub-mkconfig",
+                syntax: "grub-mkconfig -o output_file",
+                description: "Generates GRUB configuration file.",
+                examples: "sudo grub-mkconfig -o /boot/grub/grub.cfg",
+                level: "intermediate",
+                category: "grub",
+                tags: ["grub", "config", "generate"]
+            },
+            // systemd
+            {
+                name: "systemctl",
+                syntax: "systemctl [command] [unit]",
+                description: "Controls the systemd system and service manager.",
+                examples: "systemctl status nginx\nsystemctl start nginx\nsystemctl stop nginx\nsystemctl restart nginx\nsystemctl enable nginx\nsystemctl disable nginx\nsystemctl list-units --type=service",
+                level: "intermediate",
+                category: "systemd",
+                tags: ["systemd", "service", "manager", "control"]
+            },
+            {
+                name: "systemd-analyze",
+                syntax: "systemd-analyze [command]",
+                description: "Analyzes system boot-up performance.",
+                examples: "systemd-analyze time\nsystemd-analyze blame\nsystemd-analyze critical-chain nginx.service",
+                level: "advanced",
+                category: "systemd",
+                tags: ["systemd", "analyze", "boot", "performance"]
+            },
+            {
+                name: "journalctl",
+                syntax: "journalctl [options]",
+                description: "Queries the systemd journal for logs.",
+                examples: "journalctl -u nginx\njournalctl -u nginx --since '1 hour ago'\njournalctl -p err\njournalctl -f # follow\njournalctl -b # current boot",
+                level: "intermediate",
+                category: "systemd",
+                tags: ["journal", "logs", "systemd", "system"]
+            },
+            {
+                name: "systemctl list-dependencies",
+                syntax: "systemctl list-dependencies [unit]",
+                description: "Lists units required by the given unit.",
+                examples: "systemctl list-dependencies nginx\nsystemctl list-dependencies --reverse nginx",
+                level: "intermediate",
+                category: "systemd",
+                tags: ["systemd", "dependencies", "tree"]
+            },
+            {
+                name: "systemctl daemon-reload",
+                syntax: "systemctl daemon-reload",
+                description: "Reloads systemd unit files and regenerates dependency tree.",
+                examples: "sudo systemctl daemon-reload",
+                level: "intermediate",
+                category: "systemd",
+                tags: ["systemd", "reload", "config"]
+            },
+            // Runlevels
+            {
+                name: "runlevel",
+                syntax: "runlevel",
+                description: "Shows previous and current runlevel.",
+                examples: "runlevel\n# Output: N 5 (N=none, 5=graphical)",
+                level: "basic",
+                category: "runlevels",
+                tags: ["runlevel", "init", "target"]
+            },
+            {
+                name: "init",
+                syntax: "init [runlevel]",
+                description: "Changes system runlevel (legacy).",
+                examples: "init 3 # Multi-user text mode\ninit 5 # Graphical mode\ninit 0 # Shutdown\ninit 6 # Reboot",
+                level: "intermediate",
+                category: "runlevels",
+                tags: ["init", "runlevel", "target"]
+            },
+            {
+                name: "telinit",
+                syntax: "telinit [runlevel]",
+                description: "Alternative command to change runlevel.",
+                examples: "telinit 3",
+                level: "intermediate",
+                category: "runlevels",
+                tags: ["init", "runlevel", "target"]
+            },
+            {
+                name: "who -r",
+                syntax: "who -r",
+                description: "Shows current runlevel and system boot time.",
+                examples: "who -r",
+                level: "basic",
+                category: "runlevels",
+                tags: ["runlevel", "boot", "time"]
+            }
+        ];
+
+        function renderContent(items) {
+            const container = document.getElementById('content-list');
+            container.innerHTML = '';
+            
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'command-card';
+                card.innerHTML = `
+                    <div class="command-name">${item.name}</div>
+                    <div class="command-tags">
+                        <span class="level ${item.level}">${item.level}</span>
+                        <span class="category">${item.category}</span>
+                    </div>
+                    <div class="command-syntax">${item.syntax}</div>
+                    <div class="command-description">${item.description}</div>
+                    <div class="command-example"><strong>Example:</strong><br>${item.examples.replace(/\n/g, '<br>')}</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function filterContent() {
+            const search = document.getElementById('search').value.toLowerCase();
+            const category = document.getElementById('category-filter').value;
+            
+            const filtered = bootData.filter(item => {
+                const matchSearch = item.name.toLowerCase().includes(search) || 
+                    item.description.toLowerCase().includes(search) ||
+                    item.tags.some(tag => tag.includes(search));
+                const matchCategory = category === 'all' || item.category === category;
+                return matchSearch && matchCategory;
+            });
+            
+            renderContent(filtered);
+        }
+
+        document.getElementById('search').addEventListener('input', filterContent);
+        document.getElementById('category-filter').addEventListener('change', filterContent);
+        document.getElementById('reset').addEventListener('click', () => {
+            document.getElementById('search').value = '';
+            document.getElementById('category-filter').value = 'all';
+            renderContent(bootData);
+        });
+
+        renderContent(bootData);
+
+        // Apply theme from localStorage or system preference
+        const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.classList.toggle('light-theme', currentTheme === 'light');
+
+        // Theme toggle functionality
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            const isLightTheme = document.documentElement.classList.toggle('light-theme');
+            const newTheme = isLightTheme ? 'light' : 'dark';
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

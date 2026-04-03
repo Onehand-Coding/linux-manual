@@ -10,8 +10,23 @@
 <body>
     <div class="container">
         <div class="theme-toggle-container">
-            <button class="theme-toggle-btn" id="themeToggle">Toggle Theme</button>
-        </div>
+        <button class="theme-toggle-btn" id="themeToggle" title="Toggle Theme">
+            <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+        </button>
+    </div>
         
         <header class="intro">
             <h1>Welcome to the Linux Manual</h1>
@@ -34,6 +49,14 @@
                 <li><a href="manuals/performance_monitoring.html">Performance Monitoring</a></li>
                 <li><a href="manuals/text_processing.html">Text Processing</a></li>
                 <li><a href="manuals/virtualization_containers.html">Virtualization & Containers</a></li>
+                <li><a href="manuals/boot_init.html">Boot & Init</a></li>
+                <li><a href="manuals/database.html">Database Basics</a></li>
+                <li><a href="manuals/backup_restore.html">Backup & Restore</a></li>
+                <li><a href="manuals/dns_bind.html">DNS & BIND</a></li>
+                <li><a href="manuals/ssl_tls.html">SSL/TLS Certificates</a></li>
+                <li><a href="manuals/file_sharing.html">File Sharing</a></li>
+                <li><a href="manuals/kernel_modules.html">Kernel & Modules</a></li>
+                <li><a href="manuals/disk_encryption.html">Disk Encryption</a></li>
             </ul>
         </main>
 
@@ -49,14 +72,12 @@
         // Apply theme from localStorage or system preference
         const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
         document.documentElement.classList.toggle('light-theme', currentTheme === 'light');
-        document.getElementById('themeToggle').textContent = currentTheme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode';
 
         // Theme toggle functionality
         document.getElementById('themeToggle').addEventListener('click', () => {
             const isLightTheme = document.documentElement.classList.toggle('light-theme');
             const newTheme = isLightTheme ? 'light' : 'dark';
             localStorage.setItem('theme', newTheme);
-            document.getElementById('themeToggle').textContent = isLightTheme ? 'Switch to Dark Mode' : 'Switch to Light Mode';
         });
     </script>
 </body>

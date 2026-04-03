@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux Manual - DNS & BIND</title>
+    <link rel="stylesheet" href="css/styles.css"/>
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+</head>
+<body>
+
+    <div class="theme-toggle-container">
+        <button class="theme-toggle-btn" id="themeToggle" title="Toggle Theme">
+            <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+        </button>
+    </div>
+    <a href="../index.html" class="nav-back" title="Back to Index">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+    </a>
+    <h1>DNS & BIND</h1>
+    
+    <div class="search-container">
+        <input type="text" id="search" placeholder="Search DNS topics...">
+        <select id="category-filter">
+            <option value="all">All Categories</option>
+            <option value="bind">BIND</option>
+            <option value="tools">DNS Tools</option>
+            <option value="config">Configuration</option>
+        </select>
+        <button id="reset">Reset</button>
+    </div>
+    
+    <div class="command-list" id="content-list">
+    </div>
+
+    <footer>
+        DNS & BIND - Linux Manual
+    </footer>
+
+    <script>
+        const dnsData = [
+            // BIND
+            {
+                name: "named",
+                syntax: "named [options]",
+                description: "BIND DNS server daemon.",
+                examples: "systemctl start named\nsystemctl status named\nnamed -g # run in foreground\nnamed-checkconf /etc/named.conf",
+                level: "advanced",
+                category: "bind",
+                tags: ["bind", "named", "dns", "server"]
+            },
+            {
+                name: "named-checkconf",
+                syntax: "named-checkconf [options] [config_file]",
+                description: "Checks BIND configuration file syntax.",
+                examples: "named-checkconf /etc/named.conf\nnamed-checkconf -z /etc/named.conf\nnamed-checkconf -t /var/named/chroot /etc/named.conf",
+                level: "intermediate",
+                category: "bind",
+                tags: ["bind", "config", "check", "validation"]
+            },
+            {
+                name: "named-checkzone",
+                syntax: "named-checkzone [options] zone_name zone_file",
+                description: "Checks zone file syntax and validity.",
+                examples: "named-checkzone example.com /var/named/db.example.com\nnamed-checkzone -o example.com /var/named/db.example.com",
+                level: "intermediate",
+                category: "bind",
+                tags: ["bind", "zone", "check", "validation"]
+            },
+            {
+                name: "rndc",
+                syntax: "rndc [command]",
+                description: "Remote name daemon control utility for BIND.",
+                examples: "rndc reload\nrndc reload example.com\nrndc flush\nrndc status\nrndc stats\nrndc stop",
+                level: "intermediate",
+                category: "bind",
+                tags: ["bind", "rndc", "control", "reload"]
+            },
+            {
+                name: "rndc-confgen",
+                syntax: "rndc-confgen [options]",
+                description: "Generates rndc key for BIND control.",
+                examples: "rndc-confgen -a # generate key and add to config\nrndc-confgen -A hmac-sha256",
+                level: "advanced",
+                category: "bind",
+                tags: ["bind", "rndc", "key", "security"]
+            },
+            // DNS Tools
+            {
+                name: "dig",
+                syntax: "dig [@server] [options] domain [record_type]",
+                description: "DNS lookup utility for querying DNS servers.",
+                examples: "dig example.com\ndig @8.8.8.8 example.com MX\ndig example.com A +short\ndig -x 192.168.1.1 # reverse lookup\ndig example.com ANY",
+                level: "basic",
+                category: "tools",
+                tags: ["dig", "dns", "lookup", "query"]
+            },
+            {
+                name: "nslookup",
+                syntax: "nslookup [options] domain [server]",
+                description: "Query DNS servers for domain information.",
+                examples: "nslookup example.com\nnslookup -type=MX example.com\nnslookup -type=NS example.com\nnslookup example.com 8.8.8.8",
+                level: "basic",
+                category: "tools",
+                tags: ["nslookup", "dns", "lookup", "query"]
+            },
+            {
+                name: "host",
+                syntax: "host [options] domain [server]",
+                description: "Simple DNS lookup utility.",
+                examples: "host example.com\nhost -t MX example.com\nhost -a example.com\nhost 192.168.1.1 # reverse",
+                level: "basic",
+                category: "tools",
+                tags: ["host", "dns", "lookup"]
+            },
+            {
+                name: "resolvectl",
+                syntax: "resolvectl [options]",
+                description: "Resolve DNS queries using systemd-resolved.",
+                examples: "resolvectl status\nresolvectl query example.com\nresolvectl dns eth0\nresolvectl domain eth0 'example.com'",
+                level: "basic",
+                category: "tools",
+                tags: ["resolvectl", "systemd", "dns"]
+            },
+            {
+                name: "getent",
+                syntax: "getent hosts hostname",
+                description: "Query system databases including hosts.",
+                examples: "getent hosts example.com\ngetent passwd root\ngetent services http",
+                level: "basic",
+                category: "tools",
+                tags: ["getent", "hosts", "database"]
+            },
+            // Configuration
+            {
+                name: "resolv.conf",
+                syntax: "/etc/resolv.conf",
+                description: "DNS resolver configuration file.",
+                examples: "nameserver 8.8.8.8\nnameserver 8.8.4.4\nsearch example.com\noptions timeout:2 attempts:3",
+                level: "basic",
+                category: "config",
+                tags: ["resolv.conf", "dns", "resolver"]
+            },
+            {
+                name: "nsswitch.conf",
+                syntax: "/etc/nsswitch.conf",
+                description: "Name Service Switch configuration for system databases.",
+                examples: "hosts: files dns\npasswd: files sss\ngroup: files sss",
+                level: "intermediate",
+                category: "config",
+                tags: ["nsswitch", "dns", "hosts", "resolution"]
+            },
+            {
+                name: "systemd-resolved",
+                syntax: "systemctl status systemd-resolved",
+                description: "Systemd DNS resolver service.",
+                examples: "systemctl status systemd-resolved\nsystemctl enable systemd-resolved\nsystemctl restart systemd-resolved",
+                level: "intermediate",
+                category: "config",
+                tags: ["systemd", "resolved", "dns"]
+            }
+        ];
+
+        function renderContent(items) {
+            const container = document.getElementById('content-list');
+            container.innerHTML = '';
+            
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'command-card';
+                card.innerHTML = `
+                    <div class="command-name">${item.name}</div>
+                    <div class="command-tags">
+                        <span class="level ${item.level}">${item.level}</span>
+                        <span class="category">${item.category}</span>
+                    </div>
+                    <div class="command-syntax">${item.syntax}</div>
+                    <div class="command-description">${item.description}</div>
+                    <div class="command-example"><strong>Example:</strong><br>${item.examples.replace(/\n/g, '<br>')}</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function filterContent() {
+            const search = document.getElementById('search').value.toLowerCase();
+            const category = document.getElementById('category-filter').value;
+            
+            const filtered = dnsData.filter(item => {
+                const matchSearch = item.name.toLowerCase().includes(search) || 
+                    item.description.toLowerCase().includes(search) ||
+                    item.tags.some(tag => tag.includes(search));
+                const matchCategory = category === 'all' || item.category === category;
+                return matchSearch && matchCategory;
+            });
+            
+            renderContent(filtered);
+        }
+
+        document.getElementById('search').addEventListener('input', filterContent);
+        document.getElementById('category-filter').addEventListener('change', filterContent);
+        document.getElementById('reset').addEventListener('click', () => {
+            document.getElementById('search').value = '';
+            document.getElementById('category-filter').value = 'all';
+            renderContent(dnsData);
+        });
+
+        renderContent(dnsData);
+
+        // Apply theme from localStorage or system preference
+        const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.classList.toggle('light-theme', currentTheme === 'light');
+
+        // Theme toggle functionality
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            const isLightTheme = document.documentElement.classList.toggle('light-theme');
+            const newTheme = isLightTheme ? 'light' : 'dark';
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

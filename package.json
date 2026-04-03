@@ -1,0 +1,17 @@
+{
+  "name": "linux-manual",
+  "version": "1.0.0",
+  "description": "Linux Manual by OneHand Coding",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "build": "echo 'No build needed for static site'"
+  },
+  "keywords": ["linux", "manual"],
+  "author": "OneHand Coding",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

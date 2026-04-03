@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux Manual - Kernel & Modules</title>
+    <link rel="stylesheet" href="css/styles.css"/>
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+</head>
+<body>
+
+    <div class="theme-toggle-container">
+        <button class="theme-toggle-btn" id="themeToggle" title="Toggle Theme">
+            <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+        </button>
+    </div>
+    <a href="../index.html" class="nav-back" title="Back to Index">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+    </a>
+    <h1>Kernel & Modules</h1>
+    
+    <div class="search-container">
+        <input type="text" id="search" placeholder="Search kernel topics...">
+        <select id="category-filter">
+            <option value="all">All Categories</option>
+            <option value="modules">Modules</option>
+            <option value="kernel">Kernel</option>
+            <option value="sysctl">sysctl</option>
+        </select>
+        <button id="reset">Reset</button>
+    </div>
+    
+    <div class="command-list" id="content-list">
+    </div>
+
+    <footer>
+        Kernel & Modules - Linux Manual
+    </footer>
+
+    <script>
+        const kernelData = [
+            // Modules
+            {
+                name: "lsmod",
+                syntax: "lsmod",
+                description: "Shows currently loaded kernel modules.",
+                examples: "lsmod\nlsmod | grep ModuleName",
+                level: "basic",
+                category: "modules",
+                tags: ["lsmod", "modules", "loaded"]
+            },
+            {
+                name: "modprobe",
+                syntax: "modprobe [options] module_name",
+                description: "Adds or removes kernel modules.",
+                examples: "modprobe e1000 # load module\nmodprobe -r e1000 # remove module\nmodprobe -c # show config\nmodprobe -l # list available modules",
+                level: "intermediate",
+                category: "modules",
+                tags: ["modprobe", "modules", "load", "unload"]
+            },
+            {
+                name: "modinfo",
+                syntax: "modinfo [options] module_name",
+                description: "Displays information about a kernel module.",
+                examples: "modinfo e1000\nmodinfo -a e1000 # author\nmodinfo -p e1000 # parameters\nmodinfo -n e1000 # filename",
+                level: "intermediate",
+                category: "modules",
+                tags: ["modinfo", "modules", "info", "parameters"]
+            },
+            {
+                name: "insmod",
+                syntax: "insmod module_name",
+                description: "Inserts a module into the kernel (raw).",
+                examples: "insmod /path/to/module.ko\ninsmod module.ko param1=value",
+                level: "advanced",
+                category: "modules",
+                tags: ["insmod", "modules", "load"]
+            },
+            {
+                name: "rmmod",
+                syntax: "rmmod [options] module_name",
+                description: "Removes a module from the kernel.",
+                examples: "rmmod e1000\nrmmod -f e1000 # force\nrmmod -w e1000 # wait until unused",
+                level: "intermediate",
+                category: "modules",
+                tags: ["rmmod", "modules", "unload"]
+            },
+            {
+                name: "depmod",
+                syntax: "depmod [options]",
+                description: "Generates module dependency map.",
+                examples: "depmod -a # generate all\ndepmod -n # dry run\ndepmod -b /boot # custom base",
+                level: "intermediate",
+                category: "modules",
+                tags: ["depmod", "modules", "dependencies"]
+            },
+            // Kernel
+            {
+                name: "uname",
+                syntax: "uname [options]",
+                description: "Shows system information.",
+                examples: "uname -a # all info\nuname -r # kernel version\nuname -m # machine hardware\nuname -s # kernel name",
+                level: "basic",
+                category: "kernel",
+                tags: ["uname", "kernel", "version", "system"]
+            },
+            {
+                name: "dmesg",
+                syntax: "dmesg [options]",
+                description: "Shows kernel messages and logs.",
+                examples: "dmesg\ndmesg | tail\ndmesg | grep error\ndmesg -T # human readable timestamps",
+                level: "basic",
+                category: "kernel",
+                tags: ["dmesg", "kernel", "log", "messages"]
+            },
+            {
+                name: "ls /boot",
+                syntax: "ls /boot",
+                description: "Lists kernel and initrd images.",
+                examples: "ls -la /boot\nls /boot/vmlinuz*\nls /boot/initramfs*",
+                level: "basic",
+                category: "kernel",
+                tags: ["boot", "kernel", "vmlinuz", "initrd"]
+            },
+            {
+                name: "dracut",
+                syntax: "dracut [options] initramfs",
+                description: "Creates initramfs image.",
+                examples: "dracut --force initramfs.img\ndracut --md5sum initramfs.img",
+                level: "advanced",
+                category: "kernel",
+                tags: ["dracut", "initramfs", "initrd"]
+            },
+            {
+                name: "mkinitrd",
+                syntax: "mkinitrd [options] initrd_image kernel_version",
+                description: "Creates initial RAM disk image (legacy).",
+                examples: "mkinitrd /boot/initrd-$(uname -r).img $(uname -r)",
+                level: "advanced",
+                category: "kernel",
+                tags: ["mkinitrd", "initrd", "initramfs"]
+            },
+            {
+                name: "update-initramfs",
+                syntax: "update-initramfs -u",
+                description: "Updates initramfs (Debian/Ubuntu).",
+                examples: "update-initramfs -u\nupdate-initramfs -u -k all\nupdate-initramfs -d -k 5.4.0",
+                level: "advanced",
+                category: "kernel",
+                tags: ["initramfs", "update", "debian"]
+            },
+            // sysctl
+            {
+                name: "sysctl",
+                syntax: "sysctl [options] [parameter]",
+                description: "View and modify kernel parameters at runtime.",
+                examples: "sysctl -a # show all\nsysctl -w net.ipv4.forward=1\nsysctl -p /etc/sysctl.conf",
+                level: "intermediate",
+                category: "sysctl",
+                tags: ["sysctl", "kernel", "parameters", "tuning"]
+            },
+            {
+                name: "sysctl.conf",
+                syntax: "/etc/sysctl.conf",
+                description: "Configuration file for sysctl parameters.",
+                examples: "net.ipv4.ip_forward = 1\nvm.swappiness = 10\nkernel.sysrq = 1",
+                level: "intermediate",
+                category: "sysctl",
+                tags: ["sysctl", "config", "tuning"]
+            },
+            {
+                name: "systemctl sysrq",
+                syntax: "systemctl sysrq",
+                description: "Shows SysRq status and controls.",
+                examples: "echo 1 > /proc/sys/kernel/sysrq\necho s > /proc/sysrq-trigger # sync\necho b > /proc/sysrq-trigger # reboot",
+                level: "advanced",
+                category: "sysctl",
+                tags: ["sysrq", "magic", "debug", "reboot"]
+            }
+        ];
+
+        function renderContent(items) {
+            const container = document.getElementById('content-list');
+            container.innerHTML = '';
+            
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'command-card';
+                card.innerHTML = `
+                    <div class="command-name">${item.name}</div>
+                    <div class="command-tags">
+                        <span class="level ${item.level}">${item.level}</span>
+                        <span class="category">${item.category}</span>
+                    </div>
+                    <div class="command-syntax">${item.syntax}</div>
+                    <div class="command-description">${item.description}</div>
+                    <div class="command-example"><strong>Example:</strong><br>${item.examples.replace(/\n/g, '<br>')}</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function filterContent() {
+            const search = document.getElementById('search').value.toLowerCase();
+            const category = document.getElementById('category-filter').value;
+            
+            const filtered = kernelData.filter(item => {
+                const matchSearch = item.name.toLowerCase().includes(search) || 
+                    item.description.toLowerCase().includes(search) ||
+                    item.tags.some(tag => tag.includes(search));
+                const matchCategory = category === 'all' || item.category === category;
+                return matchSearch && matchCategory;
+            });
+            
+            renderContent(filtered);
+        }
+
+        document.getElementById('search').addEventListener('input', filterContent);
+        document.getElementById('category-filter').addEventListener('change', filterContent);
+        document.getElementById('reset').addEventListener('click', () => {
+            document.getElementById('search').value = '';
+            document.getElementById('category-filter').value = 'all';
+            renderContent(kernelData);
+        });
+
+        renderContent(kernelData);
+
+        // Apply theme from localStorage or system preference
+        const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.classList.toggle('light-theme', currentTheme === 'light');
+
+        // Theme toggle functionality
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            const isLightTheme = document.documentElement.classList.toggle('light-theme');
+            const newTheme = isLightTheme ? 'light' : 'dark';
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>
