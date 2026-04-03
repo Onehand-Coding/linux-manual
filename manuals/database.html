@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux Manual - Database Basics</title>
+    <link rel="stylesheet" href="css/styles.css"/>
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+</head>
+<body>
+
+    <div class="theme-toggle-container">
+        <button class="theme-toggle-btn" id="themeToggle" title="Toggle Theme">
+            <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+        </button>
+    </div>
+    <a href="../index.html" class="nav-back" title="Back to Index">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+    </a>
+    
+    <h1>Database Basics</h1>
+    
+    <div class="search-container">
+        <input type="text" id="search" placeholder="Search database topics...">
+        <select id="category-filter">
+            <option value="all">All Categories</option>
+            <option value="mysql">MySQL/MariaDB</option>
+            <option value="postgresql">PostgreSQL</option>
+            <option value="connection">Connection & Config</option>
+        </select>
+        <button id="reset">Reset</button>
+    </div>
+    
+    <div class="command-list" id="content-list">
+    </div>
+
+    <footer>
+        Database Basics - Linux Manual
+    </footer>
+
+    <script>
+        const dbData = [
+            // MySQL/MariaDB
+            {
+                name: "mysql",
+                syntax: "mysql [options] [database]",
+                description: "Command-line client for MySQL/MariaDB.",
+                examples: "mysql -u root -p\nmysql -u root -p database_name\nmysql -e 'SELECT * FROM users' database",
+                level: "intermediate",
+                category: "mysql",
+                tags: ["mysql", "mariadb", "client", "sql"]
+            },
+            {
+                name: "mysqldump",
+                syntax: "mysqldump [options] database [tables]",
+                description: "Exports MySQL database to a SQL file.",
+                examples: "mysqldump -u root -p database > backup.sql\nmysqldump --all-databases > full_backup.sql\nmysqldump -u root -p database table1 table2 > tables.sql",
+                level: "intermediate",
+                category: "mysql",
+                tags: ["mysql", "backup", "dump", "export"]
+            },
+            {
+                name: "mysqlcheck",
+                syntax: "mysqlcheck [options] database [tables]",
+                description: "Checks, repairs, optimizes, and analyzes MySQL tables.",
+                examples: "mysqlcheck -u root -p --all-databases\nmysqlcheck -u root -p -r database table\nmysqlcheck -u root -p -o database",
+                level: "intermediate",
+                category: "mysql",
+                tags: ["mysql", "repair", "optimize", "check"]
+            },
+            {
+                name: "mysql_install_db",
+                syntax: "mysql_install_db [options]",
+                description: "Initializes MySQL data directory.",
+                examples: "sudo mysql_install_db --user=mysql\nmysql_install_db --basedir=/usr --datadir=/var/lib/mysql",
+                level: "advanced",
+                category: "mysql",
+                tags: ["mysql", "init", "data-directory"]
+            },
+            {
+                name: "mariadb-upgrade",
+                syntax: "mariadb-upgrade [options]",
+                description: "Checks and upgrades MySQL/MariaDB tables after upgrade.",
+                examples: "sudo mariadb-upgrade\nsudo mariadb-upgrade -u root -p",
+                level: "advanced",
+                category: "mysql",
+                tags: ["mariadb", "upgrade", "tables"]
+            },
+            // PostgreSQL
+            {
+                name: "psql",
+                syntax: "psql [options] [database]",
+                description: "Command-line client for PostgreSQL.",
+                examples: "psql -U postgres -d database\npsql -U user -d database -c 'SELECT * FROM table'\npsql -l # list databases",
+                level: "intermediate",
+                category: "postgresql",
+                tags: ["postgresql", "psql", "client", "sql"]
+            },
+            {
+                name: "pg_dump",
+                syntax: "pg_dump [options] database",
+                description: "Exports PostgreSQL database to a SQL file.",
+                examples: "pg_dump -U postgres database > backup.sql\npg_dump -Fc database > backup.dump\npg_dumpall -U postgres > all_databases.sql",
+                level: "intermediate",
+                category: "postgresql",
+                tags: ["postgresql", "backup", "dump", "export"]
+            },
+            {
+                name: "pg_restore",
+                syntax: "pg_restore [options] database",
+                description: "Restores PostgreSQL database from pg_dump output.",
+                examples: "pg_restore -U postgres -d database backup.dump\npg_restore --create -d postgres backup.dump",
+                level: "intermediate",
+                category: "postgresql",
+                tags: ["postgresql", "restore", "import"]
+            },
+            {
+                name: "pg_isready",
+                syntax: "pg_isready [options]",
+                description: "Checks if PostgreSQL server is running and accepting connections.",
+                examples: "pg_isready\npg_isready -h localhost -p 5432",
+                level: "basic",
+                category: "postgresql",
+                tags: ["postgresql", "status", "connection"]
+            },
+            {
+                name: "pg_ctl",
+                syntax: "pg_ctl command [options]",
+                description: "Controls PostgreSQL database server.",
+                examples: "pg_ctl start -D /var/lib/postgresql/data\npg_ctl stop -D /var/lib/postgresql/data\npg_ctl status -D /var/lib/postgresql/data",
+                level: "advanced",
+                category: "postgresql",
+                tags: ["postgresql", "control", "server"]
+            },
+            {
+                name: "createdb",
+                syntax: "createdb [options] database_name",
+                description: "Creates a new PostgreSQL database.",
+                examples: "createdb mydb\ncreatedb -U postgres testdb\ncreatedb -h localhost -p 5432 newdb",
+                level: "basic",
+                category: "postgresql",
+                tags: ["postgresql", "create", "database"]
+            },
+            {
+                name: "dropdb",
+                syntax: "dropdb [options] database_name",
+                description: "Deletes a PostgreSQL database.",
+                examples: "dropdb mydb\ndropdb -U postgres testdb",
+                level: "basic",
+                category: "postgresql",
+                tags: ["postgresql", "delete", "database"]
+            },
+            // Connection & Config
+            {
+                name: "systemctl status mariadb",
+                syntax: "systemctl status mariadb",
+                description: "Checks MySQL/MariaDB service status.",
+                examples: "systemctl status mariadb\nsudo systemctl start mariadb\nsudo systemctl stop mariadb",
+                level: "basic",
+                category: "connection",
+                tags: ["mysql", "mariadb", "service", "status"]
+            },
+            {
+                name: "systemctl status postgresql",
+                syntax: "systemctl status postgresql",
+                description: "Checks PostgreSQL service status.",
+                examples: "systemctl status postgresql\nsudo systemctl start postgresql\nsudo systemctl restart postgresql",
+                level: "basic",
+                category: "connection",
+                tags: ["postgresql", "service", "status"]
+            },
+            {
+                name: "mysqlshow",
+                syntax: "mysqlshow [options]",
+                description: "Displays information about MySQL databases and tables.",
+                examples: "mysqlshow -u root -p\nmysqlshow -u root -p database\nmysqlshow -u root -p database table",
+                level: "intermediate",
+                category: "connection",
+                tags: ["mysql", "show", "databases", "tables"]
+            }
+        ];
+
+        function renderContent(items) {
+            const container = document.getElementById('content-list');
+            container.innerHTML = '';
+            
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'command-card';
+                card.innerHTML = `
+                    <div class="command-name">${item.name}</div>
+                    <div class="command-tags">
+                        <span class="level ${item.level}">${item.level}</span>
+                        <span class="category">${item.category}</span>
+                    </div>
+                    <div class="command-syntax">${item.syntax}</div>
+                    <div class="command-description">${item.description}</div>
+                    <div class="command-example"><strong>Example:</strong><br>${item.examples.replace(/\n/g, '<br>')}</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function filterContent() {
+            const search = document.getElementById('search').value.toLowerCase();
+            const category = document.getElementById('category-filter').value;
+            
+            const filtered = dbData.filter(item => {
+                const matchSearch = item.name.toLowerCase().includes(search) || 
+                    item.description.toLowerCase().includes(search) ||
+                    item.tags.some(tag => tag.includes(search));
+                const matchCategory = category === 'all' || item.category === category;
+                return matchSearch && matchCategory;
+            });
+            
+            renderContent(filtered);
+        }
+
+        document.getElementById('search').addEventListener('input', filterContent);
+        document.getElementById('category-filter').addEventListener('change', filterContent);
+        document.getElementById('reset').addEventListener('click', () => {
+            document.getElementById('search').value = '';
+            document.getElementById('category-filter').value = 'all';
+            renderContent(dbData);
+        });
+
+        renderContent(dbData);
+
+        // Apply theme from localStorage or system preference
+        const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.classList.toggle('light-theme', currentTheme === 'light');
+
+        // Theme toggle functionality
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            const isLightTheme = document.documentElement.classList.toggle('light-theme');
+            const newTheme = isLightTheme ? 'light' : 'dark';
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux Manual - SSL/TLS Certificates</title>
+    <link rel="stylesheet" href="css/styles.css"/>
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+</head>
+<body>
+
+    <div class="theme-toggle-container">
+        <button class="theme-toggle-btn" id="themeToggle" title="Toggle Theme">
+            <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+        </button>
+    </div>
+    <a href="../index.html" class="nav-back" title="Back to Index">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+    </a>
+    <h1>SSL/TLS Certificates</h1>
+    
+    <div class="search-container">
+        <input type="text" id="search" placeholder="Search SSL/TLS topics...">
+        <select id="category-filter">
+            <option value="all">All Categories</option>
+            <option value="openssl">OpenSSL</option>
+            <option value="certbot">Certbot</option>
+            <option value="tools">Certificate Tools</option>
+        </select>
+        <button id="reset">Reset</button>
+    </div>
+    
+    <div class="command-list" id="content-list">
+    </div>
+
+    <footer>
+        SSL/TLS - Linux Manual
+    </footer>
+
+    <script>
+        const sslData = [
+            // OpenSSL
+            {
+                name: "openssl req",
+                syntax: "openssl req [options]",
+                description: "Creates and processes certificate requests.",
+                examples: "openssl req -new -newkey rsa:2048 -nodes -keyout key.pem -out cert.csr\nopenssl req -new -x509 -days 365 -key key.pem -out cert.pem",
+                level: "intermediate",
+                category: "openssl",
+                tags: ["openssl", "certificate", "request", "CSR"]
+            },
+            {
+                name: "openssl x509",
+                syntax: "openssl x509 [options]",
+                description: "Certificate display and signing utility.",
+                examples: "openssl x509 -in cert.pem -text -noout\nopenssl x509 -in cert.pem -enddate -noout\nopenssl x509 -in cert.csr -out cert.pem -signkey key.pem",
+                level: "intermediate",
+                category: "openssl",
+                tags: ["openssl", "certificate", "x509"]
+            },
+            {
+                name: "openssl genrsa",
+                syntax: "openssl genrsa [options]",
+                description: "Generates RSA private key.",
+                examples: "openssl genrsa -out key.pem 2048\nopenssl genrsa -aes256 -out key.pem 4096",
+                level: "intermediate",
+                category: "openssl",
+                tags: ["openssl", "key", "rsa", "private"]
+            },
+            {
+                name: "openssl rsa",
+                syntax: "openssl rsa [options]",
+                description: "Manipulates RSA private keys.",
+                examples: "openssl rsa -in key.pem -text -noout\nopenssl rsa -in key.pem -pubout -out pubkey.pem\nopenssl rsa -in encrypted.pem -out decrypted.pem",
+                level: "intermediate",
+                category: "openssl",
+                tags: ["openssl", "rsa", "key", "convert"]
+            },
+            {
+                name: "openssl s_client",
+                syntax: "openssl s_client [options]",
+                description: "SSL/TLS client to test connections.",
+                examples: "openssl s_client -connect example.com:443\nopenssl s_client -connect example.com:443 -servername example.com\nopenssl s_client -connect example.com:443 -showcerts",
+                level: "intermediate",
+                category: "openssl",
+                tags: ["openssl", "ssl", "test", "client"]
+            },
+            {
+                name: "openssl dhparam",
+                syntax: "openssl dhparam [options]",
+                description: "Generates Diffie-Hellman parameters.",
+                examples: "openssl dhparam -out dhparam.pem 2048\nopenssl dhparam -dsaparam -out dhparam.pem 2048",
+                level: "advanced",
+                category: "openssl",
+                tags: ["openssl", "dhparam", "diffie-hellman"]
+            },
+            {
+                name: "openssl pkcs12",
+                syntax: "openssl pkcs12 [options]",
+                description: "Creates and manipulates PKCS#12 files.",
+                examples: "openssl pkcs12 -export -in cert.pem -inkey key.pem -out bundle.p12\nopenssl pkcs12 -in bundle.p12 -nodes",
+                level: "intermediate",
+                category: "openssl",
+                tags: ["openssl", "pkcs12", "pfx", "keystore"]
+            },
+            {
+                name: "openssl verify",
+                syntax: "openssl verify [options] certificate",
+                description: "Verifies certificate chain.",
+                examples: "openssl verify -CAfile ca.pem cert.pem\nopenssl verify -untrusted intermediate.pem -trusted root.pem cert.pem",
+                level: "intermediate",
+                category: "openssl",
+                tags: ["openssl", "verify", "certificate", "chain"]
+            },
+            // Certbot
+            {
+                name: "certbot certonly",
+                syntax: "certbot certonly [options]",
+                description: "Obtains SSL certificate without installing it.",
+                examples: "sudo certbot certonly --standalone -d example.com\nsudo certbot certonly --webroot -w /var/www/html -d example.com\nsudo certbot certonly --nginx -d example.com",
+                level: "intermediate",
+                category: "certbot",
+                tags: ["certbot", "letsencrypt", "certificate", "ssl"]
+            },
+            {
+                name: "certbot renew",
+                syntax: "certbot renew [options]",
+                description: "Renew all certificates that are nearing expiration.",
+                examples: "sudo certbot renew\nsudo certbot renew --dry-run\nsudo certbot renew --cert-name example.com",
+                level: "intermediate",
+                category: "certbot",
+                tags: ["certbot", "renew", "letsencrypt"]
+            },
+            {
+                name: "certbot certificates",
+                syntax: "certbot certificates",
+                description: "List managed certificates.",
+                examples: "certbot certificates\nsudo certbot certificates",
+                level: "basic",
+                category: "certbot",
+                tags: ["certbot", "list", "certificates"]
+            },
+            {
+                name: "certbot delete",
+                syntax: "certbot delete [options]",
+                description: "Delete certificate files.",
+                examples: "sudo certbot delete --cert-name example.com\nsudo certbot delete",
+                level: "intermediate",
+                category: "certbot",
+                tags: ["certbot", "delete", "certificate"]
+            },
+            // Tools
+            {
+                name: "curl -k",
+                syntax: "curl -k [options] url",
+                description: "Test SSL connections (allow insecure).",
+                examples: "curl -k https://example.com\ncurl -vk https://example.com # verbose",
+                level: "basic",
+                category: "tools",
+                tags: ["curl", "ssl", "test", "https"]
+            },
+            {
+                name: "ssllabs-scan",
+                syntax: "ssllabs-scan [options] hostname",
+                description: "SSL Labs server test (external).",
+                examples: "https://www.ssllabs.com/ssltest/analyze.html?d=example.com",
+                level: "intermediate",
+                category: "tools",
+                tags: ["ssl", "test", "analysis", "labs"]
+            },
+            {
+                name: "keytool",
+                syntax: "keytool [commands]",
+                description: "Java key and certificate management.",
+                examples: "keytool -list -keystore keystore.jks\nkeytool -genkeypair -alias mykey -keystore keystore.jks\nkeytool -importcert -alias mycert -file cert.pem -keystore keystore.jks",
+                level: "intermediate",
+                category: "tools",
+                tags: ["keytool", "java", "keystore", "certificate"]
+            }
+        ];
+
+        function renderContent(items) {
+            const container = document.getElementById('content-list');
+            container.innerHTML = '';
+            
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'command-card';
+                card.innerHTML = `
+                    <div class="command-name">${item.name}</div>
+                    <div class="command-tags">
+                        <span class="level ${item.level}">${item.level}</span>
+                        <span class="category">${item.category}</span>
+                    </div>
+                    <div class="command-syntax">${item.syntax}</div>
+                    <div class="command-description">${item.description}</div>
+                    <div class="command-example"><strong>Example:</strong><br>${item.examples.replace(/\n/g, '<br>')}</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function filterContent() {
+            const search = document.getElementById('search').value.toLowerCase();
+            const category = document.getElementById('category-filter').value;
+            
+            const filtered = sslData.filter(item => {
+                const matchSearch = item.name.toLowerCase().includes(search) || 
+                    item.description.toLowerCase().includes(search) ||
+                    item.tags.some(tag => tag.includes(search));
+                const matchCategory = category === 'all' || item.category === category;
+                return matchSearch && matchCategory;
+            });
+            
+            renderContent(filtered);
+        }
+
+        document.getElementById('search').addEventListener('input', filterContent);
+        document.getElementById('category-filter').addEventListener('change', filterContent);
+        document.getElementById('reset').addEventListener('click', () => {
+            document.getElementById('search').value = '';
+            document.getElementById('category-filter').value = 'all';
+            renderContent(sslData);
+        });
+
+        renderContent(sslData);
+
+        // Apply theme from localStorage or system preference
+        const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.classList.toggle('light-theme', currentTheme === 'light');
+
+        // Theme toggle functionality
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            const isLightTheme = document.documentElement.classList.toggle('light-theme');
+            const newTheme = isLightTheme ? 'light' : 'dark';
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>
